@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import Navbar from './Navbar';
 import TemplateSelector from './TemplateSelector';
@@ -21,6 +21,26 @@ export default function Profile() {
     const [error, setError] = useState('');
     const [currentTemplate, setCurrentTemplate] = useState(user?.template || 'minimal');
     const [copied, setCopied] = useState(false);
+
+    // Real-time stats fetched directly from Firestore
+    const [realStats, setRealStats] = useState({ profileViews: 0, followersCount: 0 });
+
+    // Listen to real-time stats directly from Firestore (bypass AuthContext)
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const unsubscribe = onSnapshot(doc(db, 'users', user.id), (docSnapshot) => {
+            if (docSnapshot.exists()) {
+                const data = docSnapshot.data();
+                setRealStats({
+                    profileViews: data.profileViews || data.views || 0,
+                    followersCount: data.followersCount || 0
+                });
+            }
+        });
+
+        return () => unsubscribe();
+    }, [user?.id]);
 
     // Sync template when user data loads/changes
     useEffect(() => {
@@ -334,17 +354,12 @@ export default function Profile() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 mb-8">
-                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center relative group">
-                        <div className="text-3xl font-bold text-primary mb-1">{user?.profileViews || user?.views || 0}</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1">
-                            {t('views')}
-                            <button onClick={() => refreshUser && refreshUser()} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded-full" title="Refresh">
-                                <span className="material-symbols-outlined text-[10px]">refresh</span>
-                            </button>
-                        </div>
+                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                        <div className="text-3xl font-bold text-primary mb-1">{realStats.profileViews}</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">{t('views')}</div>
                     </div>
                     <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
-                        <div className="text-3xl font-bold text-primary mb-1">{user?.followersCount || 0}</div>
+                        <div className="text-3xl font-bold text-primary mb-1">{realStats.followersCount}</div>
                         <div className="text-sm text-slate-500 dark:text-slate-400">{t('followers')}</div>
                     </div>
                 </div>
