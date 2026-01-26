@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -12,6 +13,7 @@ export default function Register() {
     const [loading, setLoading] = useState(false);
 
     const { register } = useAuth();
+    const { t, language, toggleLanguage } = useLanguage();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -19,12 +21,12 @@ export default function Register() {
         setError('');
 
         if (password !== confirmPassword) {
-            setError('Şifreler eşleşmiyor');
+            setError(t('passwordsDontMatch'));
             return;
         }
 
         if (password.length < 6) {
-            setError('Şifre en az 6 karakter olmalıdır');
+            setError(t('passwordTooShort'));
             return;
         }
 
@@ -42,6 +44,14 @@ export default function Register() {
 
     return (
         <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background-light dark:bg-background-dark relative overflow-hidden">
+            {/* Language Toggle */}
+            <button
+                onClick={toggleLanguage}
+                className="absolute top-4 right-4 z-50 flex h-9 items-center justify-center rounded-lg px-3 text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100 dark:text-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
+            >
+                {language === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}
+            </button>
+
             {/* Decorative blobs */}
             <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-purple-200/50 dark:bg-purple-900/20 blur-3xl opacity-60"></div>
             <div className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-blue-200/50 dark:bg-primary/10 blur-3xl opacity-60"></div>
@@ -57,8 +67,8 @@ export default function Register() {
                             </div>
                             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">Cardly</span>
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Hesap Oluştur</h1>
-                        <p className="text-slate-500 dark:text-slate-400">Kendi profilini oluşturmaya başla</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t('createAccount')}</h1>
+                        <p className="text-slate-500 dark:text-slate-400">{t('startCreating')}</p>
                     </div>
 
                     {/* Error Alert */}
@@ -73,7 +83,7 @@ export default function Register() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Ad Soyad
+                                {t('fullName')}
                             </label>
                             <input
                                 type="text"
@@ -81,14 +91,14 @@ export default function Register() {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className="w-full h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                placeholder="Adınız Soyadınız"
+                                placeholder={t('fullName')}
                                 required
                             />
                         </div>
 
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                E-posta
+                                {t('email')}
                             </label>
                             <input
                                 type="email"
@@ -103,7 +113,7 @@ export default function Register() {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Şifre
+                                {t('password')}
                             </label>
                             <div className="relative">
                                 <input
@@ -112,7 +122,7 @@ export default function Register() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full h-12 px-4 pr-12 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                    placeholder="En az 6 karakter"
+                                    placeholder={t('minChars')}
                                     required
                                     minLength={6}
                                 />
@@ -130,7 +140,7 @@ export default function Register() {
 
                         <div>
                             <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Şifre Tekrar
+                                {t('confirmPassword')}
                             </label>
                             <input
                                 type={showPassword ? 'text' : 'password'}
@@ -138,7 +148,7 @@ export default function Register() {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 className="w-full h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                placeholder="Şifrenizi tekrar girin"
+                                placeholder={t('retypePassword')}
                                 required
                             />
                         </div>
@@ -151,16 +161,16 @@ export default function Register() {
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                             ) : (
-                                'Kayıt Ol'
+                                t('register')
                             )}
                         </button>
                     </form>
 
                     {/* Footer */}
                     <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                        Zaten hesabın var mı?{' '}
+                        {t('alreadyHaveAccount')}{' '}
                         <Link to="/login" className="font-semibold text-primary hover:text-primary/80 transition-colors">
-                            Giriş Yap
+                            {t('login')}
                         </Link>
                     </p>
                 </div>

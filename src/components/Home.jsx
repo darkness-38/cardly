@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Home() {
     const { isAuthenticated } = useAuth();
+    const { t, language, toggleLanguage } = useLanguage();
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -16,22 +18,29 @@ export default function Home() {
                         <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Cardly</span>
                     </div>
                     <nav className="hidden md:flex items-center gap-8">
-                        <a className="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors" href="#features">Özellikler</a>
-                        <a className="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors" href="#templates">Şablonlar</a>
-                        <a className="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors" href="#pricing">Fiyatlar</a>
+                        <a className="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors" href="#features">{t('features')}</a>
+                        <a className="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors" href="#templates">{t('templates')}</a>
                     </nav>
                     <div className="flex items-center gap-3">
+                        {/* Language Toggle */}
+                        <button
+                            onClick={toggleLanguage}
+                            className="flex h-9 items-center justify-center rounded-lg px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
+                        >
+                            {language === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}
+                        </button>
+
                         {isAuthenticated ? (
                             <Link to="/dashboard" className="flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:-translate-y-0.5">
-                                Dashboard
+                                {t('dashboard')}
                             </Link>
                         ) : (
                             <>
                                 <Link to="/login" className="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors">
-                                    Giriş Yap
+                                    {t('login')}
                                 </Link>
                                 <Link to="/register" className="flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:-translate-y-0.5">
-                                    Başla
+                                    {t('getStarted')}
                                 </Link>
                             </>
                         )}
@@ -48,25 +57,17 @@ export default function Home() {
 
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="flex flex-col items-center text-center">
-                            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-6">
-                                <span className="mr-1 inline-block h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                                Yeni Şablonlar Mevcut
-                            </div>
                             <h1 className="max-w-4xl text-5xl font-black leading-[1.1] tracking-tight text-slate-900 dark:text-white sm:text-6xl md:text-7xl mb-6">
-                                Kendi Alanını <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">Dakikalar İçinde Oluştur.</span>
+                                {t('heroTitle1')} <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">{t('heroTitle2')}</span>
                             </h1>
                             <p className="max-w-2xl text-lg text-slate-600 dark:text-slate-300 mb-10 leading-relaxed">
-                                İhtiyacın olan tek bağlantı. Tüm içeriklerini tek bir URL ile paylaş. Kod yazmana gerek yok.
+                                {t('heroDescription')}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-20">
                                 <Link to="/register" className="flex h-12 min-w-[160px] items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-white shadow-xl shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-1">
-                                    Ücretsiz Başla
+                                    {t('startFree')}
                                 </Link>
-                                <button className="flex h-12 min-w-[160px] items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-8 text-base font-bold text-slate-700 dark:text-white shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:-translate-y-1">
-                                    <span className="material-symbols-outlined mr-2 text-lg">play_circle</span>
-                                    Demo İzle
-                                </button>
                             </div>
 
                             {/* Live Mobile Preview */}
@@ -86,8 +87,8 @@ export default function Home() {
                                             <div className="h-24 w-24 rounded-full border-4 border-white dark:border-slate-900 overflow-hidden bg-slate-200 shadow-md flex items-center justify-center text-3xl">
                                                 👤
                                             </div>
-                                            <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white">Örnek Kullanıcı</h3>
-                                            <p className="text-sm text-slate-500 dark:text-slate-400">Dijital Sanatçı & Tasarımcı 🎨</p>
+                                            <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white">{t('sampleUser')}</h3>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">{t('userTitle')}</p>
                                         </div>
                                         {/* Links Stack */}
                                         <div className="px-4 flex flex-col gap-3 pb-8">
@@ -96,7 +97,7 @@ export default function Home() {
                                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
                                                         <span className="material-symbols-outlined text-lg">play_arrow</span>
                                                     </div>
-                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Son Video</span>
+                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">{t('latestVideo')}</span>
                                                 </div>
                                                 <span className="material-symbols-outlined text-slate-400 group-hover:text-primary">chevron_right</span>
                                             </a>
@@ -105,7 +106,7 @@ export default function Home() {
                                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
                                                         <span className="material-symbols-outlined text-lg">work</span>
                                                     </div>
-                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Portfolyo</span>
+                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">{t('portfolio')}</span>
                                                 </div>
                                                 <span className="material-symbols-outlined text-slate-400 group-hover:text-primary">chevron_right</span>
                                             </a>
@@ -114,7 +115,7 @@ export default function Home() {
                                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
                                                         <span className="material-symbols-outlined text-lg">shopping_bag</span>
                                                     </div>
-                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Mağaza</span>
+                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">{t('shop')}</span>
                                                 </div>
                                                 <span className="material-symbols-outlined text-slate-400 group-hover:text-primary">chevron_right</span>
                                             </a>
@@ -123,7 +124,7 @@ export default function Home() {
                                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
                                                         <span className="material-symbols-outlined text-lg">mail</span>
                                                     </div>
-                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Bülten</span>
+                                                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">{t('newsletter')}</span>
                                                 </div>
                                                 <span className="material-symbols-outlined text-slate-400 group-hover:text-primary">chevron_right</span>
                                             </a>
@@ -147,8 +148,8 @@ export default function Home() {
                 <section id="features" className="py-20 bg-white dark:bg-slate-900/50">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center max-w-3xl mx-auto mb-16">
-                            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl mb-4">Temel Özellikler</h2>
-                            <p className="text-lg text-slate-600 dark:text-slate-400">Çevrimiçi kitlenizi büyütmek ve dijital kimliğinizi yönetmek için ihtiyacınız olan her şey.</p>
+                            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl mb-4">{t('coreFeatures')}</h2>
+                            <p className="text-lg text-slate-600 dark:text-slate-400">{t('featuresDescription')}</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {/* Feature 1 */}
@@ -156,9 +157,9 @@ export default function Home() {
                                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary dark:bg-primary/20 group-hover:scale-110 transition-transform">
                                     <span className="material-symbols-outlined text-3xl">palette</span>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Özelleştirilebilir</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t('customizable')}</h3>
                                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    Kişisel markanızı özel temalar, yazı tipleri ve renklerle eşleştirin. Kod yazmadan tamamen sizin yapın.
+                                    {t('customizableDesc')}
                                 </p>
                             </div>
                             {/* Feature 2 */}
@@ -166,9 +167,9 @@ export default function Home() {
                                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary dark:bg-primary/20 group-hover:scale-110 transition-transform">
                                     <span className="material-symbols-outlined text-3xl">bar_chart</span>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Analitik</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t('analytics')}</h3>
                                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    Görüntülemeleri ve tıklamaları takip ederek kitlenizi anlayın. Hangi içeriğin en iyi performansı gösterdiğini keşfedin.
+                                    {t('analyticsDesc')}
                                 </p>
                             </div>
                             {/* Feature 3 */}
@@ -176,9 +177,9 @@ export default function Home() {
                                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary dark:bg-primary/20 group-hover:scale-110 transition-transform">
                                     <span className="material-symbols-outlined text-3xl">bolt</span>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Hızlı</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t('fast')}</h3>
                                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    Takipçilerinizi meşgul tutmak için hız için optimize edilmiş. Hızlı yükleme süreleri daha iyi dönüşüm demektir.
+                                    {t('fastDesc')}
                                 </p>
                             </div>
                         </div>
@@ -191,14 +192,14 @@ export default function Home() {
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="rounded-3xl bg-white dark:bg-slate-800 p-8 md:p-16 text-center shadow-xl border border-slate-100 dark:border-slate-700">
                             <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white sm:text-4xl md:text-5xl mb-6">
-                                Başlamaya Hazır mısın?
+                                {t('readyToLaunch')}
                             </h2>
                             <p className="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300 mb-10">
-                                Bugün alanını oluşturan binlerce yaratıcıya katıl. Başlamak ücretsiz ve 5 dakikadan az sürüyor.
+                                {t('ctaDescription')}
                             </p>
                             <div className="flex flex-col sm:flex-row justify-center gap-4">
                                 <Link to="/register" className="flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-1">
-                                    Ücretsiz Başla
+                                    {t('startFree')}
                                 </Link>
                             </div>
                         </div>
@@ -217,11 +218,11 @@ export default function Home() {
                             <span className="text-lg font-bold text-slate-900 dark:text-white">Cardly</span>
                         </div>
                         <div className="flex flex-wrap items-center justify-center gap-8">
-                            <a className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Gizlilik Politikası</a>
-                            <a className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Kullanım Şartları</a>
-                            <a className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">Destek</a>
+                            <a className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">{t('privacyPolicy')}</a>
+                            <a className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">{t('termsOfService')}</a>
+                            <a className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors" href="#">{t('support')}</a>
                         </div>
-                        <p className="text-sm text-slate-400 dark:text-slate-500">© 2026 Cardly. Tüm hakları saklıdır.</p>
+                        <p className="text-sm text-slate-400 dark:text-slate-500">{t('copyright')}</p>
                     </div>
                 </div>
             </footer>

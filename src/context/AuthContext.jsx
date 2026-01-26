@@ -1,4 +1,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    updateProfile as firebaseUpdateProfile
+} from 'firebase/auth';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
 const AuthContext = createContext(null);
 
@@ -7,101 +16,126 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for existing session
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
-        }
-        setLoading(false);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                // Get additional user data from Firestore
+                const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+                const userData = userDoc.exists() ? userDoc.data() : {};
+
+                setUser({
+                    id: firebaseUser.uid,
+                    email: firebaseUser.email,
+                    name: firebaseUser.displayName || userData.name || '',
+                    bio: userData.bio || '',
+                    avatar: firebaseUser.photoURL || userData.avatar || '',
+                    location: userData.location || '',
+                    website: userData.website || '',
+                    createdAt: userData.createdAt || firebaseUser.metadata.creationTime
+                });
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
     }, []);
 
-    const register = (email, password, name) => {
-        return new Promise((resolve, reject) => {
-            // Get existing users
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const register = async (email, password, name) => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const firebaseUser = userCredential.user;
 
-            // Check if user already exists
-            if (users.find(u => u.email === email)) {
-                reject(new Error('Bu e-posta adresi zaten kayıtlı'));
-                return;
-            }
+            // Update display name in Firebase Auth
+            await firebaseUpdateProfile(firebaseUser, { displayName: name });
 
-            // Create new user
-            const newUser = {
-                id: Date.now().toString(),
-                email,
-                password, // In production, this should be hashed
+            // Create user document in Firestore
+            await setDoc(doc(db, 'users', firebaseUser.uid), {
                 name,
+                email,
                 bio: '',
                 avatar: '',
                 location: '',
                 website: '',
                 createdAt: new Date().toISOString()
+            });
+
+            return {
+                id: firebaseUser.uid,
+                email: firebaseUser.email,
+                name
             };
-
-            // Save to users list
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-
-            // Log in the user
-            const { password: _, ...userWithoutPassword } = newUser;
-            setUser(userWithoutPassword);
-            localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-
-            resolve(userWithoutPassword);
-        });
+        } catch (error) {
+            let message = 'Kayıt sırasında bir hata oluştu';
+            if (error.code === 'auth/email-already-in-use') {
+                message = 'Bu e-posta adresi zaten kayıtlı';
+            } else if (error.code === 'auth/weak-password') {
+                message = 'Şifre çok zayıf';
+            } else if (error.code === 'auth/invalid-email') {
+                message = 'Geçersiz e-posta adresi';
+            }
+            throw new Error(message);
+        }
     };
 
-    const login = (email, password) => {
-        return new Promise((resolve, reject) => {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const foundUser = users.find(u => u.email === email && u.password === password);
-
-            if (!foundUser) {
-                reject(new Error('E-posta veya şifre hatalı'));
-                return;
+    const login = async (email, password) => {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            return userCredential.user;
+        } catch (error) {
+            let message = 'Giriş sırasında bir hata oluştu';
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                message = 'E-posta veya şifre hatalı';
+            } else if (error.code === 'auth/too-many-requests') {
+                message = 'Çok fazla başarısız giriş denemesi. Lütfen daha sonra tekrar deneyin';
             }
-
-            const { password: _, ...userWithoutPassword } = foundUser;
-            setUser(userWithoutPassword);
-            localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-
-            resolve(userWithoutPassword);
-        });
+            throw new Error(message);
+        }
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('currentUser');
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            setUser(null);
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     };
 
-    const updateProfile = (updates) => {
-        return new Promise((resolve, reject) => {
-            if (!user) {
-                reject(new Error('Giriş yapmanız gerekiyor'));
-                return;
+    const updateProfile = async (updates) => {
+        if (!user) {
+            throw new Error('Giriş yapmanız gerekiyor');
+        }
+
+        try {
+            // Update Firestore document
+            await updateDoc(doc(db, 'users', user.id), {
+                name: updates.name,
+                bio: updates.bio,
+                location: updates.location,
+                website: updates.website,
+                avatar: updates.avatar
+            });
+
+            // Update Firebase Auth profile
+            if (auth.currentUser) {
+                await firebaseUpdateProfile(auth.currentUser, {
+                    displayName: updates.name,
+                    photoURL: updates.avatar
+                });
             }
 
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const userIndex = users.findIndex(u => u.id === user.id);
+            // Update local state
+            setUser(prev => ({
+                ...prev,
+                ...updates
+            }));
 
-            if (userIndex === -1) {
-                reject(new Error('Kullanıcı bulunamadı'));
-                return;
-            }
-
-            // Update user
-            const updatedUser = { ...users[userIndex], ...updates };
-            users[userIndex] = updatedUser;
-            localStorage.setItem('users', JSON.stringify(users));
-
-            // Update current session
-            const { password: _, ...userWithoutPassword } = updatedUser;
-            setUser(userWithoutPassword);
-            localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-
-            resolve(userWithoutPassword);
-        });
+            return { ...user, ...updates };
+        } catch (error) {
+            console.error('Update profile error:', error);
+            throw new Error('Profil güncellenirken bir hata oluştu');
+        }
     };
 
     const value = {

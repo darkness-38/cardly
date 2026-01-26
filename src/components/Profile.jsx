@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from './Navbar';
-import './Profile.css';
 
 export default function Profile() {
     const { user, updateProfile } = useAuth();
+    const { t, language } = useLanguage();
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
@@ -31,7 +32,7 @@ export default function Profile() {
 
         try {
             await updateProfile(formData);
-            setSuccess('Profil başarıyla güncellendi!');
+            setSuccess(t('profileUpdated'));
             setIsEditing(false);
         } catch (err) {
             setError(err.message);
@@ -58,203 +59,240 @@ export default function Profile() {
     };
 
     const memberSince = user?.createdAt
-        ? new Date(user.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' })
+        ? new Date(user.createdAt).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long' })
         : '';
 
     return (
-        <>
+        <div className="min-h-screen bg-background-light dark:bg-background-dark">
             <Navbar />
-            <div className="profile-page">
-                <div className="profile-cover"></div>
 
-                <div className="container">
-                    <div className="profile-header">
-                        <div className="profile-info animate-fade-in">
-                            <div className="profile-avatar">
+            <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Profile Header */}
+                <div className="relative rounded-3xl overflow-hidden mb-8">
+                    {/* Cover */}
+                    <div className="h-40 md:h-52 bg-gradient-to-r from-primary via-purple-500 to-blue-500"></div>
+
+                    {/* Profile Info */}
+                    <div className="relative bg-white dark:bg-slate-800 px-6 pb-6 pt-16 md:pt-20 border border-slate-200 dark:border-slate-700 border-t-0 rounded-b-3xl">
+                        {/* Avatar */}
+                        <div className="absolute -top-12 md:-top-16 left-6 md:left-8">
+                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-3xl md:text-4xl font-bold text-white border-4 border-white dark:border-slate-800 shadow-xl">
                                 {user?.avatar ? (
-                                    <img src={user.avatar} alt={user.name} />
+                                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover rounded-2xl" />
                                 ) : (
                                     getInitials(user?.name)
                                 )}
                             </div>
-                            <h1 className="profile-name">{user?.name || 'Kullanıcı'}</h1>
-                            <p className="profile-email">{user?.email}</p>
+                        </div>
 
-                            {user?.bio && <p className="profile-bio">{user.bio}</p>}
+                        {/* Edit Button */}
+                        <div className="absolute top-4 right-4">
+                            {!isEditing && (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5 shadow-lg shadow-primary/20"
+                                >
+                                    <span className="material-symbols-outlined text-lg">edit</span>
+                                    {t('edit')}
+                                </button>
+                            )}
+                        </div>
 
-                            <div className="profile-meta">
+                        {/* Name & Info */}
+                        <div className="mt-4">
+                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">
+                                {user?.name || t('user')}
+                            </h1>
+                            <p className="text-slate-500 dark:text-slate-400 mb-4">{user?.email}</p>
+
+                            {user?.bio && (
+                                <p className="text-slate-600 dark:text-slate-300 max-w-xl mb-4">{user.bio}</p>
+                            )}
+
+                            <div className="flex flex-wrap gap-4 text-sm text-slate-500 dark:text-slate-400">
                                 {user?.location && (
-                                    <div className="profile-meta-item">
-                                        <span>📍</span>
-                                        <span>{user.location}</span>
+                                    <div className="flex items-center gap-1">
+                                        <span className="material-symbols-outlined text-lg text-primary">location_on</span>
+                                        {user.location}
                                     </div>
                                 )}
                                 {user?.website && (
-                                    <div className="profile-meta-item">
-                                        <span>🌐</span>
-                                        <a href={user.website} target="_blank" rel="noopener noreferrer">
-                                            {user.website.replace(/^https?:\/\//, '')}
-                                        </a>
-                                    </div>
+                                    <a
+                                        href={user.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 hover:text-primary transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-lg text-primary">language</span>
+                                        {user.website.replace(/^https?:\/\//, '')}
+                                    </a>
                                 )}
                                 {memberSince && (
-                                    <div className="profile-meta-item">
-                                        <span>📅</span>
-                                        <span>{memberSince} tarihinden beri üye</span>
+                                    <div className="flex items-center gap-1">
+                                        <span className="material-symbols-outlined text-lg text-primary">calendar_month</span>
+                                        {memberSince}{t('memberSince')}
                                     </div>
-                                )}
-                            </div>
-
-                            <div className="profile-actions">
-                                {!isEditing && (
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={() => setIsEditing(true)}
-                                    >
-                                        ✏️ Profili Düzenle
-                                    </button>
                                 )}
                             </div>
                         </div>
-                    </div>
-
-                    <div className="profile-content">
-                        {/* Stats Section */}
-                        <div className="profile-stats">
-                            <div className="stat-card glass-card">
-                                <div className="stat-number">1</div>
-                                <div className="stat-label">Profil Görüntüleme</div>
-                            </div>
-                            <div className="stat-card glass-card">
-                                <div className="stat-number">0</div>
-                                <div className="stat-label">Paylaşım</div>
-                            </div>
-                            <div className="stat-card glass-card">
-                                <div className="stat-number">0</div>
-                                <div className="stat-label">Takipçi</div>
-                            </div>
-                        </div>
-
-                        {/* Edit Form */}
-                        {isEditing && (
-                            <div className="profile-edit-form glass-card">
-                                <div className="profile-section-header">
-                                    <h2 className="profile-section-title">Profil Bilgilerini Düzenle</h2>
-                                </div>
-
-                                {success && (
-                                    <div className="alert alert-success">
-                                        <span>✅</span> {success}
-                                    </div>
-                                )}
-
-                                {error && (
-                                    <div className="alert alert-error">
-                                        <span>⚠️</span> {error}
-                                    </div>
-                                )}
-
-                                <form onSubmit={handleSubmit}>
-                                    <div className="avatar-upload">
-                                        <div className="avatar-preview">
-                                            {formData.avatar ? (
-                                                <img src={formData.avatar} alt="Avatar" />
-                                            ) : (
-                                                getInitials(formData.name)
-                                            )}
-                                        </div>
-                                        <div className="form-group avatar-upload-btn">
-                                            <label className="form-label">Avatar URL</label>
-                                            <input
-                                                type="url"
-                                                name="avatar"
-                                                className="form-input"
-                                                placeholder="https://example.com/avatar.jpg"
-                                                value={formData.avatar}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="profile-form-grid">
-                                        <div className="form-group">
-                                            <label className="form-label" htmlFor="name">Ad Soyad</label>
-                                            <input
-                                                type="text"
-                                                id="name"
-                                                name="name"
-                                                className="form-input"
-                                                placeholder="Adınız Soyadınız"
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label className="form-label" htmlFor="bio">Hakkımda</label>
-                                            <textarea
-                                                id="bio"
-                                                name="bio"
-                                                className="form-input form-textarea"
-                                                placeholder="Kendinizi kısaca tanıtın..."
-                                                value={formData.bio}
-                                                onChange={handleChange}
-                                                rows={3}
-                                            />
-                                        </div>
-
-                                        <div className="profile-form-row">
-                                            <div className="form-group">
-                                                <label className="form-label" htmlFor="location">Konum</label>
-                                                <input
-                                                    type="text"
-                                                    id="location"
-                                                    name="location"
-                                                    className="form-input"
-                                                    placeholder="İstanbul, Türkiye"
-                                                    value={formData.location}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-
-                                            <div className="form-group">
-                                                <label className="form-label" htmlFor="website">Website</label>
-                                                <input
-                                                    type="url"
-                                                    id="website"
-                                                    name="website"
-                                                    className="form-input"
-                                                    placeholder="https://website.com"
-                                                    value={formData.website}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="profile-form-actions">
-                                        <button
-                                            type="button"
-                                            className="btn btn-secondary"
-                                            onClick={handleCancel}
-                                        >
-                                            İptal
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary"
-                                            disabled={loading}
-                                        >
-                                            {loading ? <span className="spinner"></span> : '💾 Kaydet'}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
                     </div>
                 </div>
-            </div>
-        </>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                        <div className="text-3xl font-bold text-primary mb-1">1</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">{t('views')}</div>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                        <div className="text-3xl font-bold text-primary mb-1">0</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">{t('shares')}</div>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                        <div className="text-3xl font-bold text-primary mb-1">0</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400">{t('followers')}</div>
+                    </div>
+                </div>
+
+                {/* Success/Error Messages */}
+                {success && (
+                    <div className="mb-6 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-sm flex items-center gap-2">
+                        <span className="material-symbols-outlined text-lg">check_circle</span>
+                        {success}
+                    </div>
+                )}
+
+                {error && (
+                    <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
+                        <span className="material-symbols-outlined text-lg">error</span>
+                        {error}
+                    </div>
+                )}
+
+                {/* Edit Form */}
+                {isEditing && (
+                    <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('editProfileTitle')}</h2>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Avatar URL */}
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-xl font-bold text-white shrink-0">
+                                    {formData.avatar ? (
+                                        <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
+                                    ) : (
+                                        getInitials(formData.name)
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <label htmlFor="avatar" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                        {t('avatarUrl')}
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="avatar"
+                                        name="avatar"
+                                        value={formData.avatar}
+                                        onChange={handleChange}
+                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                        placeholder="https://example.com/avatar.jpg"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Name */}
+                            <div>
+                                <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                    {t('fullName')}
+                                </label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                    placeholder={t('fullName')}
+                                    required
+                                />
+                            </div>
+
+                            {/* Bio */}
+                            <div>
+                                <label htmlFor="bio" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                    {t('aboutMe')}
+                                </label>
+                                <textarea
+                                    id="bio"
+                                    name="bio"
+                                    value={formData.bio}
+                                    onChange={handleChange}
+                                    rows={3}
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                                    placeholder={t('describeYourself')}
+                                />
+                            </div>
+
+                            {/* Location & Website */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="location" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                        {t('location')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="location"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                        placeholder="Istanbul, Turkey"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="website" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                        {t('website')}
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="website"
+                                        name="website"
+                                        value={formData.website}
+                                        onChange={handleChange}
+                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                        placeholder="https://website.com"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex gap-3 justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                >
+                                    {t('cancel')}
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="px-6 py-2.5 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {loading ? (
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    ) : (
+                                        <>
+                                            <span className="material-symbols-outlined text-lg">save</span>
+                                            {t('save')}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+            </main>
+        </div>
     );
 }

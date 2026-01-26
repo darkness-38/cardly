@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
 
     const { login } = useAuth();
+    const { t, language, toggleLanguage } = useLanguage();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -29,6 +31,14 @@ export default function Login() {
 
     return (
         <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background-light dark:bg-background-dark relative overflow-hidden">
+            {/* Language Toggle */}
+            <button
+                onClick={toggleLanguage}
+                className="absolute top-4 right-4 z-50 flex h-9 items-center justify-center rounded-lg px-3 text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100 dark:text-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
+            >
+                {language === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}
+            </button>
+
             {/* Decorative blobs */}
             <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-purple-200/50 dark:bg-purple-900/20 blur-3xl opacity-60"></div>
             <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-blue-200/50 dark:bg-primary/10 blur-3xl opacity-60"></div>
@@ -44,8 +54,8 @@ export default function Login() {
                             </div>
                             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">Cardly</span>
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Tekrar Hoş Geldin</h1>
-                        <p className="text-slate-500 dark:text-slate-400">Hesabına giriş yap</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t('welcomeBack')}</h1>
+                        <p className="text-slate-500 dark:text-slate-400">{t('loginToAccount')}</p>
                     </div>
 
                     {/* Error Alert */}
@@ -60,7 +70,7 @@ export default function Login() {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                E-posta
+                                {t('email')}
                             </label>
                             <input
                                 type="email"
@@ -75,7 +85,7 @@ export default function Login() {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Şifre
+                                {t('password')}
                             </label>
                             <div className="relative">
                                 <input
@@ -108,16 +118,16 @@ export default function Login() {
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                             ) : (
-                                'Giriş Yap'
+                                t('login')
                             )}
                         </button>
                     </form>
 
                     {/* Footer */}
                     <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                        Hesabın yok mu?{' '}
+                        {t('noAccount')}{' '}
                         <Link to="/register" className="font-semibold text-primary hover:text-primary/80 transition-colors">
-                            Kayıt Ol
+                            {t('register')}
                         </Link>
                     </p>
                 </div>
@@ -129,8 +139,8 @@ export default function Login() {
                             <span className="material-symbols-outlined">verified_user</span>
                         </div>
                         <div>
-                            <p className="font-semibold text-slate-900 dark:text-white text-sm">Güvenli</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">256-bit şifreleme</p>
+                            <p className="font-semibold text-slate-900 dark:text-white text-sm">{t('secure')}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{t('encryption')}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 p-4 rounded-xl bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
@@ -138,8 +148,8 @@ export default function Login() {
                             <span className="material-symbols-outlined">bolt</span>
                         </div>
                         <div>
-                            <p className="font-semibold text-slate-900 dark:text-white text-sm">Hızlı</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Anında erişim</p>
+                            <p className="font-semibold text-slate-900 dark:text-white text-sm">{t('fastAccess')}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{t('instantAccess')}</p>
                         </div>
                     </div>
                 </div>

@@ -1,8 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Navbar() {
     const { user, logout, isAuthenticated } = useAuth();
+    const { t, language, toggleLanguage } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -40,7 +42,7 @@ export default function Navbar() {
                                         }`}
                                 >
                                     <span className="material-symbols-outlined text-lg">home</span>
-                                    Dashboard
+                                    {t('dashboard')}
                                 </Link>
                                 <Link
                                     to="/profile"
@@ -50,11 +52,19 @@ export default function Navbar() {
                                         }`}
                                 >
                                     <span className="material-symbols-outlined text-lg">person</span>
-                                    Profil
+                                    {t('profile')}
                                 </Link>
                             </nav>
 
                             <div className="flex items-center gap-3">
+                                {/* Language Toggle */}
+                                <button
+                                    onClick={toggleLanguage}
+                                    className="flex h-8 items-center justify-center rounded-lg px-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
+                                >
+                                    {language === 'tr' ? 'EN' : 'TR'}
+                                </button>
+
                                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                                     <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                                         {user?.avatar ? (
@@ -72,23 +82,31 @@ export default function Navbar() {
                                     className="flex h-9 items-center gap-2 justify-center rounded-lg px-4 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 dark:text-slate-300 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors"
                                 >
                                     <span className="material-symbols-outlined text-lg">logout</span>
-                                    <span className="hidden sm:inline">Çıkış</span>
+                                    <span className="hidden sm:inline">{t('logout')}</span>
                                 </button>
                             </div>
                         </>
                     ) : (
                         <>
+                            {/* Language Toggle */}
+                            <button
+                                onClick={toggleLanguage}
+                                className="flex h-9 items-center justify-center rounded-lg px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
+                            >
+                                {language === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}
+                            </button>
+
                             <Link
                                 to="/login"
                                 className="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
                             >
-                                Giriş Yap
+                                {t('login')}
                             </Link>
                             <Link
                                 to="/register"
                                 className="flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:-translate-y-0.5"
                             >
-                                Başla
+                                {t('getStarted')}
                             </Link>
                         </>
                     )}

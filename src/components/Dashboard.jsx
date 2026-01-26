@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Navbar from './Navbar';
 
 export default function Dashboard() {
     const { user } = useAuth();
+    const { t } = useLanguage();
 
     const getInitials = (name) => {
         if (!name) return '?';
@@ -12,9 +14,9 @@ export default function Dashboard() {
 
     const getGreeting = () => {
         const hour = new Date().getHours();
-        if (hour < 12) return 'Günaydın';
-        if (hour < 18) return 'İyi günler';
-        return 'İyi akşamlar';
+        if (hour < 12) return t('goodMorning');
+        if (hour < 18) return t('goodAfternoon');
+        return t('goodEvening');
     };
 
     const calculateCompletion = () => {
@@ -50,7 +52,7 @@ export default function Dashboard() {
                                 {getGreeting()}, {user?.name?.split(' ')[0]}! 👋
                             </h1>
                             <p className="text-white/80">
-                                Cardly profiline hoş geldin. Bugün ne yapmak istersin?
+                                {t('welcomeToCardly')}
                             </p>
                         </div>
                     </div>
@@ -58,7 +60,7 @@ export default function Dashboard() {
 
                 {/* Quick Actions */}
                 <div className="mb-8">
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Hızlı Erişim</h2>
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('quickAccess')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <Link
                             to="/profile"
@@ -68,8 +70,8 @@ export default function Dashboard() {
                                 <span className="material-symbols-outlined text-2xl">person</span>
                             </div>
                             <div className="flex-1">
-                                <h3 className="font-semibold text-slate-900 dark:text-white">Profilim</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Profil bilgilerini görüntüle</p>
+                                <h3 className="font-semibold text-slate-900 dark:text-white">{t('myProfile')}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{t('viewProfile')}</p>
                             </div>
                             <span className="material-symbols-outlined text-slate-400 group-hover:text-primary group-hover:translate-x-1 transition-all">
                                 chevron_right
@@ -84,8 +86,8 @@ export default function Dashboard() {
                                 <span className="material-symbols-outlined text-2xl">edit</span>
                             </div>
                             <div className="flex-1">
-                                <h3 className="font-semibold text-slate-900 dark:text-white">Profili Düzenle</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Bilgilerini güncelle</p>
+                                <h3 className="font-semibold text-slate-900 dark:text-white">{t('editProfile')}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{t('updateInfo')}</p>
                             </div>
                             <span className="material-symbols-outlined text-slate-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all">
                                 chevron_right
@@ -97,10 +99,10 @@ export default function Dashboard() {
                                 <span className="material-symbols-outlined text-2xl">link</span>
                             </div>
                             <div className="flex-1">
-                                <h3 className="font-semibold text-slate-900 dark:text-white">Bağlantılar</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Sosyal medya linkleri</p>
+                                <h3 className="font-semibold text-slate-900 dark:text-white">{t('links')}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{t('socialLinks')}</p>
                                 <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded">
-                                    Yakında
+                                    {t('comingSoon')}
                                 </span>
                             </div>
                         </div>
@@ -109,35 +111,35 @@ export default function Dashboard() {
 
                 {/* Stats Grid */}
                 <div className="mb-8">
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Genel Bakış</h2>
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('overview')}</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3">
                                 <span className="material-symbols-outlined">visibility</span>
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">1</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">Görüntüleme</div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('views')}</div>
                         </div>
                         <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 mb-3">
                                 <span className="material-symbols-outlined">description</span>
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{user?.bio ? '1' : '0'}</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">Bio</div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('bio')}</div>
                         </div>
                         <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-3">
                                 <span className="material-symbols-outlined">location_on</span>
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{user?.location ? '✓' : '–'}</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">Konum</div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('location')}</div>
                         </div>
                         <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 mb-3">
                                 <span className="material-symbols-outlined">language</span>
                             </div>
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{user?.website ? '✓' : '–'}</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">Website</div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('website')}</div>
                         </div>
                     </div>
                 </div>
@@ -145,7 +147,7 @@ export default function Dashboard() {
                 {/* Profile Completion */}
                 <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Profil Tamamlama</h2>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('profileCompletion')}</h2>
                         <span className="text-2xl font-bold text-primary">{calculateCompletion()}%</span>
                     </div>
                     <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-6">
@@ -159,25 +161,25 @@ export default function Dashboard() {
                             <span className="material-symbols-outlined text-lg">
                                 {user?.name ? 'check_circle' : 'radio_button_unchecked'}
                             </span>
-                            Ad soyad
+                            {t('fullNameItem')}
                         </div>
                         <div className={`flex items-center gap-2 text-sm ${user?.bio ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
                             <span className="material-symbols-outlined text-lg">
                                 {user?.bio ? 'check_circle' : 'radio_button_unchecked'}
                             </span>
-                            Bio
+                            {t('bio')}
                         </div>
                         <div className={`flex items-center gap-2 text-sm ${user?.location ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
                             <span className="material-symbols-outlined text-lg">
                                 {user?.location ? 'check_circle' : 'radio_button_unchecked'}
                             </span>
-                            Konum
+                            {t('location')}
                         </div>
                         <div className={`flex items-center gap-2 text-sm ${user?.avatar ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
                             <span className="material-symbols-outlined text-lg">
                                 {user?.avatar ? 'check_circle' : 'radio_button_unchecked'}
                             </span>
-                            Profil fotoğrafı
+                            {t('profilePhoto')}
                         </div>
                     </div>
                 </div>
