@@ -335,7 +335,7 @@ export default function Profile() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 mb-8">
                     <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
-                        <div className="text-3xl font-bold text-primary mb-1">{user?.profileViews || 0}</div>
+                        <div className="text-3xl font-bold text-primary mb-1">{user?.profileViews || user?.views || 0}</div>
                         <div className="text-sm text-slate-500 dark:text-slate-400">{t('views')}</div>
                     </div>
                     <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
