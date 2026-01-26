@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Navbar from './Navbar';
 import TemplateSelector from './TemplateSelector';
+import PlayfulEditor from './editors/PlayfulEditor';
 import { templates } from '../data/templates';
 
 export default function Profile() {
@@ -16,18 +17,54 @@ export default function Profile() {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
     const [currentTemplate, setCurrentTemplate] = useState(user?.template || 'minimal');
+    const [copied, setCopied] = useState(false);
+
+    // Sync template when user data loads/changes
+    useEffect(() => {
+        if (user?.template) {
+            setCurrentTemplate(user.template);
+        }
+    }, [user?.template]);
 
     const [formData, setFormData] = useState({
         name: user?.name || '',
+        username: user?.username || '',
         bio: user?.bio || '',
         location: user?.location || '',
         website: user?.website || '',
         avatar: user?.avatar || ''
     });
 
+    // Sync form data when user changescd
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                name: user.name || '',
+                username: user.username || '',
+                bio: user.bio || '',
+                location: user.location || '',
+                website: user.website || '',
+                avatar: user.avatar || ''
+            });
+        }
+    }, [user]);
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+        // Username formatting: lowercase, no spaces, only alphanumeric and underscore
+        if (name === 'username') {
+            value = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        }
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const checkUsernameAvailable = async (username) => {
+        if (!username || username.length < 3) return false;
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('username', '==', username.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+        // Available if no results or only result is current user
+        return querySnapshot.empty || (querySnapshot.size === 1 && querySnapshot.docs[0].id === user?.id);
     };
 
     const handleSubmit = async (e) => {
@@ -37,7 +74,26 @@ export default function Profile() {
         setLoading(true);
 
         try {
-            await updateProfile(formData);
+            // Check username availability if changed
+            if (formData.username && formData.username !== user?.username) {
+                const available = await checkUsernameAvailable(formData.username);
+                if (!available) {
+                    setError(language === 'tr' ? 'Bu kullanıcı adı zaten alınmış' : 'This username is already taken');
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            // Update profile with username
+            await updateDoc(doc(db, 'users', user.id), {
+                name: formData.name,
+                username: formData.username?.toLowerCase() || '',
+                bio: formData.bio,
+                location: formData.location,
+                website: formData.website,
+                avatar: formData.avatar
+            });
+
             setSuccess(t('profileUpdated'));
             setIsEditing(false);
         } catch (err) {
@@ -65,6 +121,7 @@ export default function Profile() {
     const handleCancel = () => {
         setFormData({
             name: user?.name || '',
+            username: user?.username || '',
             bio: user?.bio || '',
             location: user?.location || '',
             website: user?.website || '',
@@ -85,11 +142,78 @@ export default function Profile() {
         ? new Date(user.createdAt).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long' })
         : '';
 
+    const profileUrl = user?.username ? `${window.location.origin}/${user.username}` : null;
+
+    const copyProfileLink = () => {
+        if (profileUrl) {
+            navigator.clipboard.writeText(profileUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-background-light dark:bg-background-dark">
             <Navbar />
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Share Link Banner */}
+                {user?.username && (
+                    <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                                <span className="material-symbols-outlined">link</span>
+                            </div>
+                            <div>
+                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                    {language === 'tr' ? 'Profil Linkiniz' : 'Your Profile Link'}
+                                </p>
+                                <p className="font-semibold text-primary">{profileUrl}</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={copyProfileLink}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all ${copied
+                                ? 'bg-green-500 text-white'
+                                : 'bg-primary text-white hover:bg-primary/90'
+                                }`}
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {copied ? 'check' : 'content_copy'}
+                            </span>
+                            {copied
+                                ? (language === 'tr' ? 'Kopyalandı!' : 'Copied!')
+                                : (language === 'tr' ? 'Linki Kopyala' : 'Copy Link')
+                            }
+                        </button>
+                    </div>
+                )}
+
+                {/* No username warning */}
+                {!user?.username && (
+                    <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
+                            <span className="material-symbols-outlined">warning</span>
+                        </div>
+                        <div className="flex-1">
+                            <p className="font-medium text-amber-800 dark:text-amber-200">
+                                {language === 'tr' ? 'Kullanıcı adı belirlemediniz!' : 'No username set!'}
+                            </p>
+                            <p className="text-sm text-amber-600 dark:text-amber-400">
+                                {language === 'tr'
+                                    ? 'Profilinizi paylaşmak için bir kullanıcı adı oluşturun.'
+                                    : 'Create a username to share your profile.'}
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="px-4 py-2 rounded-xl bg-amber-600 text-white font-medium text-sm hover:bg-amber-700 transition-colors"
+                        >
+                            {language === 'tr' ? 'Oluştur' : 'Create'}
+                        </button>
+                    </div>
+                )}
+
                 {/* Profile Header */}
                 <div className="relative rounded-3xl overflow-hidden mb-8">
                     {/* Cover */}
@@ -133,6 +257,9 @@ export default function Profile() {
                             <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">
                                 {user?.name || t('user')}
                             </h1>
+                            {user?.username && (
+                                <p className="text-primary font-medium mb-2">@{user.username}</p>
+                            )}
                             <p className="text-slate-500 dark:text-slate-400 mb-4">{user?.email}</p>
 
                             {user?.bio && (
@@ -228,126 +355,157 @@ export default function Profile() {
 
                 {/* Edit Form */}
                 {isEditing && (
-                    <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('editProfileTitle')}</h2>
+                    currentTemplate === 'playful' ? (
+                        <PlayfulEditor onClose={() => setIsEditing(false)} />
+                    ) : (
+                        <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('editProfileTitle')}</h2>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Avatar URL */}
-                            <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-xl font-bold text-white shrink-0">
-                                    {formData.avatar ? (
-                                        <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
-                                    ) : (
-                                        getInitials(formData.name)
-                                    )}
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Avatar URL */}
+                                <div className="flex items-center gap-4">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-xl font-bold text-white shrink-0">
+                                        {formData.avatar ? (
+                                            <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
+                                        ) : (
+                                            getInitials(formData.name)
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <label htmlFor="avatar" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            {t('avatarUrl')}
+                                        </label>
+                                        <input
+                                            type="url"
+                                            id="avatar"
+                                            name="avatar"
+                                            value={formData.avatar}
+                                            onChange={handleChange}
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                            placeholder="https://example.com/avatar.jpg"
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <label htmlFor="avatar" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        {t('avatarUrl')}
-                                    </label>
-                                    <input
-                                        type="url"
-                                        id="avatar"
-                                        name="avatar"
-                                        value={formData.avatar}
-                                        onChange={handleChange}
-                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                        placeholder="https://example.com/avatar.jpg"
-                                    />
-                                </div>
-                            </div>
 
-                            {/* Name */}
-                            <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    {t('fullName')}
-                                </label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                    placeholder={t('fullName')}
-                                    required
-                                />
-                            </div>
-
-                            {/* Bio */}
-                            <div>
-                                <label htmlFor="bio" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    {t('aboutMe')}
-                                </label>
-                                <textarea
-                                    id="bio"
-                                    name="bio"
-                                    value={formData.bio}
-                                    onChange={handleChange}
-                                    rows={3}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                                    placeholder={t('describeYourself')}
-                                />
-                            </div>
-
-                            {/* Location & Website */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Username */}
                                 <div>
-                                    <label htmlFor="location" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        {t('location')}
+                                    <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                        {language === 'tr' ? 'Kullanıcı Adı' : 'Username'}
+                                        <span className="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">@</span>
+                                        <input
+                                            type="text"
+                                            id="username"
+                                            name="username"
+                                            value={formData.username}
+                                            onChange={handleChange}
+                                            className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                            placeholder="kullanici_adi"
+                                            minLength={3}
+                                            maxLength={30}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-400 mt-1">
+                                        {language === 'tr'
+                                            ? 'Küçük harf, sayı ve alt çizgi kullanabilirsiniz (min 3 karakter)'
+                                            : 'Lowercase letters, numbers and underscore only (min 3 chars)'}
+                                    </p>
+                                </div>
+
+                                {/* Name */}
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                        {t('fullName')}
                                     </label>
                                     <input
                                         type="text"
-                                        id="location"
-                                        name="location"
-                                        value={formData.location}
+                                        id="name"
+                                        name="name"
+                                        value={formData.name}
                                         onChange={handleChange}
                                         className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                        placeholder="Istanbul, Turkey"
+                                        placeholder={t('fullName')}
+                                        required
                                     />
                                 </div>
-                                <div>
-                                    <label htmlFor="website" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        {t('website')}
-                                    </label>
-                                    <input
-                                        type="url"
-                                        id="website"
-                                        name="website"
-                                        value={formData.website}
-                                        onChange={handleChange}
-                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                        placeholder="https://website.com"
-                                    />
-                                </div>
-                            </div>
 
-                            {/* Actions */}
-                            <div className="flex gap-3 justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
-                                <button
-                                    type="button"
-                                    onClick={handleCancel}
-                                    className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                                >
-                                    {t('cancel')}
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="px-6 py-2.5 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                >
-                                    {loading ? (
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    ) : (
-                                        <>
-                                            <span className="material-symbols-outlined text-lg">save</span>
-                                            {t('save')}
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                                {/* Bio */}
+                                <div>
+                                    <label htmlFor="bio" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                        {t('aboutMe')}
+                                    </label>
+                                    <textarea
+                                        id="bio"
+                                        name="bio"
+                                        value={formData.bio}
+                                        onChange={handleChange}
+                                        rows={3}
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                                        placeholder={t('describeYourself')}
+                                    />
+                                </div>
+
+                                {/* Location & Website */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="location" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            {t('location')}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="location"
+                                            name="location"
+                                            value={formData.location}
+                                            onChange={handleChange}
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                            placeholder="Istanbul, Turkey"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="website" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            {t('website')}
+                                        </label>
+                                        <input
+                                            type="url"
+                                            id="website"
+                                            name="website"
+                                            value={formData.website}
+                                            onChange={handleChange}
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                            placeholder="https://website.com"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex gap-3 justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                                    <button
+                                        type="button"
+                                        onClick={handleCancel}
+                                        className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                    >
+                                        {t('cancel')}
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="px-6 py-2.5 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    >
+                                        {loading ? (
+                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        ) : (
+                                            <>
+                                                <span className="material-symbols-outlined text-lg">save</span>
+                                                {t('save')}
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    )
                 )}
             </main>
         </div>

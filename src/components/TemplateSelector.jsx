@@ -15,6 +15,11 @@ export default function TemplateSelector({ currentTemplate, onSelect, user }) {
 
     const PreviewComponent = previewTemplate ? getTemplateComponent(previewTemplate) : null;
 
+    const handleSelect = (templateId) => {
+        onSelect(templateId);
+        setPreviewTemplate(templateId);
+    };
+
     return (
         <div className="space-y-6">
             {/* Template Grid */}
@@ -22,60 +27,29 @@ export default function TemplateSelector({ currentTemplate, onSelect, user }) {
                 {templates.map((template) => (
                     <button
                         key={template.id}
-                        onClick={() => onSelect(template.id)}
-                        onMouseEnter={() => setPreviewTemplate(template.id)}
-                        onMouseLeave={() => setPreviewTemplate(null)}
+                        onClick={() => handleSelect(template.id)}
                         className={`relative group rounded-2xl overflow-hidden border-2 transition-all hover:scale-[1.02] ${currentTemplate === template.id
-                                ? 'border-primary ring-2 ring-primary/20'
-                                : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                            ? 'border-primary ring-2 ring-primary/20'
+                            : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
                             }`}
                     >
                         {/* Preview Thumbnail */}
-                        <div className={`h-32 ${template.preview}`}>
-                            {template.id === 'minimal' && (
-                                <div className="h-full flex flex-col items-center justify-center">
-                                    <div className="w-8 h-8 rounded-full bg-slate-200"></div>
-                                    <div className="mt-2 w-16 h-2 bg-slate-200 rounded"></div>
+                        <div className="h-32">
+                            {template.id === 'playful' && (
+                                <div className="h-full bg-amber-50 relative overflow-hidden">
+                                    <div className="absolute top-2 left-2 w-6 h-6 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] bg-amber-200"></div>
+                                    <div className="absolute top-4 right-3 w-5 h-5 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] bg-pink-200"></div>
+                                    <div className="absolute bottom-3 left-3 w-5 h-5 rounded-[53%_47%_52%_48%/36%_41%_59%_64%] bg-blue-200"></div>
+                                    <div className="absolute bottom-2 right-2 w-4 h-4 rounded-[70%_30%_30%_70%/60%_40%_60%_40%] bg-green-200"></div>
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-amber-400 border-2 border-dashed border-amber-600"></div>
                                 </div>
                             )}
-                            {template.id === 'gradient-hero' && (
-                                <div className="h-full flex flex-col">
-                                    <div className="h-12 bg-gradient-to-r from-purple-500 to-blue-500"></div>
-                                    <div className="flex-1 bg-slate-50 flex flex-col items-center pt-4">
-                                        <div className="w-8 h-8 rounded-lg bg-white shadow-sm -mt-6"></div>
-                                        <div className="mt-2 w-16 h-2 bg-slate-200 rounded"></div>
+                            {template.id === 'neumorphic' && (
+                                <div className="h-full bg-[#bfbfbf] flex flex-col items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-[#bfbfbf] shadow-[3px_3px_6px_#969696,-3px_-3px_6px_#dadada] flex items-center justify-center">
+                                        <div className="w-6 h-6 rounded-full bg-[#bfbfbf] shadow-[inset_2px_2px_4px_#969696,inset_-2px_-2px_4px_#dadada]"></div>
                                     </div>
-                                </div>
-                            )}
-                            {template.id === 'dark-mode' && (
-                                <div className="h-full bg-slate-900 flex flex-col items-center justify-center">
-                                    <div className="w-8 h-8 rounded-full bg-slate-700 ring-2 ring-purple-500/30"></div>
-                                    <div className="mt-2 w-16 h-2 bg-slate-700 rounded"></div>
-                                </div>
-                            )}
-                            {template.id === 'pastel' && (
-                                <div className="h-full bg-gradient-to-br from-pink-100 to-yellow-100 flex flex-col items-center justify-center">
-                                    <div className="w-8 h-8 rounded-full bg-white shadow"></div>
-                                    <div className="mt-2 w-16 h-2 bg-pink-200 rounded"></div>
-                                </div>
-                            )}
-                            {template.id === 'professional' && (
-                                <div className="h-full bg-slate-100 flex flex-col">
-                                    <div className="h-4 bg-white border-b border-slate-200"></div>
-                                    <div className="flex-1 flex items-center justify-center gap-2 p-2">
-                                        <div className="w-6 h-6 rounded bg-slate-300"></div>
-                                        <div className="flex-1">
-                                            <div className="w-12 h-1.5 bg-slate-300 rounded mb-1"></div>
-                                            <div className="w-8 h-1 bg-slate-200 rounded"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            {template.id === 'creative' && (
-                                <div className="h-full bg-gradient-to-br from-orange-400 to-pink-600 p-3">
-                                    <div className="w-6 h-6 rounded-lg bg-white/20 mb-2"></div>
-                                    <div className="w-12 h-2 bg-white/80 rounded mb-1"></div>
-                                    <div className="w-8 h-2 bg-white/80 rounded"></div>
+                                    <div className="mt-4 w-16 h-3 rounded-full bg-[#bfbfbf] shadow-[3px_3px_6px_#969696,-3px_-3px_6px_#dadada]"></div>
                                 </div>
                             )}
                         </div>
@@ -92,21 +66,48 @@ export default function TemplateSelector({ currentTemplate, onSelect, user }) {
                             </div>
                         )}
 
-                        {/* Premium Badge */}
-                        {template.isPremium && (
-                            <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-400 text-amber-900 text-xs font-bold">
-                                PRO
-                            </div>
-                        )}
+                        {/* Eye icon for preview */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                            <span className="material-symbols-outlined text-white text-3xl opacity-0 group-hover:opacity-100 transition-opacity">
+                                visibility
+                            </span>
+                        </div>
                     </button>
                 ))}
             </div>
 
-            {/* Live Preview */}
+            {/* Live Preview Modal */}
             {previewTemplate && (
-                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setPreviewTemplate(null)}>
-                    <div className="w-full max-w-sm h-[600px] rounded-3xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-                        <PreviewComponent user={user} links={sampleLinks} />
+                <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setPreviewTemplate(null)}>
+                    <div className="relative" onClick={e => e.stopPropagation()}>
+                        {/* Close button */}
+                        <button
+                            onClick={() => setPreviewTemplate(null)}
+                            className="absolute -top-12 right-0 text-white hover:text-slate-300 flex items-center gap-2"
+                        >
+                            <span>{language === 'tr' ? 'Kapat' : 'Close'}</span>
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+
+                        {/* Phone frame */}
+                        <div className="w-[340px] rounded-[2.5rem] border-[8px] border-slate-900 bg-slate-900 shadow-2xl overflow-hidden">
+                            {/* Notch */}
+                            <div className="absolute top-0 inset-x-0 h-6 bg-slate-900 z-30 flex justify-center">
+                                <div className="h-4 w-32 bg-black rounded-b-xl"></div>
+                            </div>
+                            {/* Screen */}
+                            <div className="h-[600px] overflow-y-auto no-scrollbar">
+                                <PreviewComponent user={user} links={sampleLinks} />
+                            </div>
+                        </div>
+
+                        {/* Template name */}
+                        <p className="text-center text-white mt-4 font-medium">
+                            {templates.find(t => t.id === previewTemplate)?.name}
+                            {currentTemplate === previewTemplate && (
+                                <span className="ml-2 text-primary">✓ {language === 'tr' ? 'Seçili' : 'Selected'}</span>
+                            )}
+                        </p>
                     </div>
                 </div>
             )}

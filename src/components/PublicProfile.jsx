@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getTemplateComponent } from './templates';
 
@@ -14,20 +14,36 @@ export default function PublicProfile() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                // For now, we'll use the username as the user ID
-                // In a real app, you'd have a username -> userId mapping
-                const userDoc = await getDoc(doc(db, 'users', username));
+                // Search for user by username
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('username', '==', username.toLowerCase()));
+                const querySnapshot = await getDocs(q);
 
-                if (userDoc.exists()) {
-                    setUser({ id: userDoc.id, ...userDoc.data() });
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0];
+                    const userData = { id: userDoc.id, ...userDoc.data() };
+                    setUser(userData);
 
-                    // Fetch user links (if you have a links subcollection)
-                    // For now, we'll use sample links
-                    setLinks([
-                        { title: 'Website', url: user?.website || '#' },
-                    ].filter(l => l.url && l.url !== '#'));
+                    // Set links from user data
+                    const userLinks = [];
+                    if (userData.website) {
+                        userLinks.push({ title: 'Website', url: userData.website });
+                    }
+                    setLinks(userLinks);
                 } else {
-                    setError('Kullanıcı bulunamadı');
+                    // Try direct ID lookup as fallback
+                    const userDoc = await getDoc(doc(db, 'users', username));
+                    if (userDoc.exists()) {
+                        const userData = { id: userDoc.id, ...userDoc.data() };
+                        setUser(userData);
+                        const userLinks = [];
+                        if (userData.website) {
+                            userLinks.push({ title: 'Website', url: userData.website });
+                        }
+                        setLinks(userLinks);
+                    } else {
+                        setError('Kullanıcı bulunamadı');
+                    }
                 }
             } catch (err) {
                 console.error('Error fetching user:', err);

@@ -26,9 +26,6 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* Public profile - viewable by anyone */}
-            <Route path="/u/:username" element={<PublicProfile />} />
-
             {/* Protected routes */}
             <Route
                 path="/dashboard"
@@ -47,8 +44,8 @@ function App() {
                 }
             />
 
-            {/* Catch all - redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Public profile - must be last to catch username routes */}
+            <Route path="/:username" element={<PublicProfile />} />
         </Routes>
     );
 }

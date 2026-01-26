@@ -29,10 +29,14 @@ export function AuthProvider({ children }) {
                     id: firebaseUser.uid,
                     email: firebaseUser.email,
                     name: firebaseUser.displayName || userData.name || '',
+                    username: userData.username || '',
                     bio: userData.bio || '',
                     avatar: firebaseUser.photoURL || userData.avatar || '',
                     location: userData.location || '',
                     website: userData.website || '',
+                    template: userData.template || 'playful',
+                    badge: userData.badge || '✨',
+                    links: userData.links || [],
                     createdAt: userData.createdAt || firebaseUser.metadata.creationTime
                 });
             } else {
