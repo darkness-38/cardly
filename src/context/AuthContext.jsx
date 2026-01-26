@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
                 // Listen to real-time updates from Firestore
                 firestoreUnsubscribe = onSnapshot(doc(db, 'users', firebaseUser.uid), (docSnapshot) => {
                     const userData = docSnapshot.exists() ? docSnapshot.data() : {};
+                    // console.log("Real-time Update:", userData); // Debugging
 
                     setUser({
                         id: firebaseUser.uid,
