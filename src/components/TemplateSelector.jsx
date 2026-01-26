@@ -44,14 +44,6 @@ export default function TemplateSelector({ currentTemplate, onSelect, user }) {
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-amber-400 border-2 border-dashed border-amber-600"></div>
                                 </div>
                             )}
-                            {template.id === 'neumorphic' && (
-                                <div className="h-full bg-[#bfbfbf] flex flex-col items-center justify-center">
-                                    <div className="w-10 h-10 rounded-full bg-[#bfbfbf] shadow-[3px_3px_6px_#969696,-3px_-3px_6px_#dadada] flex items-center justify-center">
-                                        <div className="w-6 h-6 rounded-full bg-[#bfbfbf] shadow-[inset_2px_2px_4px_#969696,inset_-2px_-2px_4px_#dadada]"></div>
-                                    </div>
-                                    <div className="mt-4 w-16 h-3 rounded-full bg-[#bfbfbf] shadow-[3px_3px_6px_#969696,-3px_-3px_6px_#dadada]"></div>
-                                </div>
-                            )}
                             {template.id === 'brutalist' && (
                                 <div className="h-full bg-[#230f1c] flex flex-col items-center justify-center border-4 border-[#f91fb1]">
                                     <div className="w-12 h-12 bg-[#f91fb1] flex items-center justify-center text-white">

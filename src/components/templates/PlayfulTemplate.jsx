@@ -111,6 +111,11 @@ export default function PlayfulTemplate({ user, links = [] }) {
                                 <span className="text-2xl font-bold text-slate-800 dark:text-white">{user?.followingCount || 0}</span>
                                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Following</span>
                             </div>
+                            <div className="w-px h-8 bg-amber-200 dark:bg-amber-800"></div>
+                            <div className="flex flex-col items-center px-4">
+                                <span className="text-2xl font-bold text-slate-800 dark:text-white">{user?.profileViews || 0}</span>
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Views</span>
+                            </div>
                         </div>
 
                         <FollowButton

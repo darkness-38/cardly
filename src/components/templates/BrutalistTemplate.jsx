@@ -71,6 +71,10 @@ export default function BrutalistTemplate({ user, links = [] }) {
                                         <span className="text-white font-black text-2xl leading-none">{user?.followingCount || 0}</span>
                                         <span className="text-[#f91fb1] text-[10px] font-mono uppercase">Following</span>
                                     </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-white font-black text-2xl leading-none">{user?.profileViews || 0}</span>
+                                        <span className="text-[#f91fb1] text-[10px] font-mono uppercase">Views</span>
+                                    </div>
                                 </div>
 
                                 <FollowButton

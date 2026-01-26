@@ -8,13 +8,6 @@ export const templates = [
         isPremium: false
     },
     {
-        id: 'neumorphic',
-        name: 'Neumorphism',
-        description: 'Soft UI ve taktiksel dokunuşlar',
-        preview: 'bg-[#bfbfbf]',
-        isPremium: false
-    },
-    {
         id: 'brutalist',
         name: 'Brutalist',
         description: 'Yüksek kontrast, neon ve ham tasarım',
