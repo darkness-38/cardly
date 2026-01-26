@@ -6,6 +6,8 @@ import { db } from '../firebase';
 import Navbar from './Navbar';
 import TemplateSelector from './TemplateSelector';
 import PlayfulEditor from './editors/PlayfulEditor';
+import NeumorphicEditor from './editors/NeumorphicEditor';
+import BrutalistEditor from './editors/BrutalistEditor';
 import { templates } from '../data/templates';
 
 export default function Profile() {
@@ -355,157 +357,19 @@ export default function Profile() {
 
                 {/* Edit Form */}
                 {isEditing && (
-                    currentTemplate === 'playful' ? (
-                        <PlayfulEditor onClose={() => setIsEditing(false)} />
-                    ) : (
-                        <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('editProfileTitle')}</h2>
-
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Avatar URL */}
-                                <div className="flex items-center gap-4">
-                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-xl font-bold text-white shrink-0">
-                                        {formData.avatar ? (
-                                            <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
-                                        ) : (
-                                            getInitials(formData.name)
-                                        )}
-                                    </div>
-                                    <div className="flex-1">
-                                        <label htmlFor="avatar" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                            {t('avatarUrl')}
-                                        </label>
-                                        <input
-                                            type="url"
-                                            id="avatar"
-                                            name="avatar"
-                                            value={formData.avatar}
-                                            onChange={handleChange}
-                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                            placeholder="https://example.com/avatar.jpg"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Username */}
-                                <div>
-                                    <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        {language === 'tr' ? 'Kullanıcı Adı' : 'Username'}
-                                        <span className="text-red-500 ml-1">*</span>
-                                    </label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">@</span>
-                                        <input
-                                            type="text"
-                                            id="username"
-                                            name="username"
-                                            value={formData.username}
-                                            onChange={handleChange}
-                                            className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                            placeholder="kullanici_adi"
-                                            minLength={3}
-                                            maxLength={30}
-                                        />
-                                    </div>
-                                    <p className="text-xs text-slate-400 mt-1">
-                                        {language === 'tr'
-                                            ? 'Küçük harf, sayı ve alt çizgi kullanabilirsiniz (min 3 karakter)'
-                                            : 'Lowercase letters, numbers and underscore only (min 3 chars)'}
-                                    </p>
-                                </div>
-
-                                {/* Name */}
-                                <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        {t('fullName')}
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                        placeholder={t('fullName')}
-                                        required
-                                    />
-                                </div>
-
-                                {/* Bio */}
-                                <div>
-                                    <label htmlFor="bio" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        {t('aboutMe')}
-                                    </label>
-                                    <textarea
-                                        id="bio"
-                                        name="bio"
-                                        value={formData.bio}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                                        placeholder={t('describeYourself')}
-                                    />
-                                </div>
-
-                                {/* Location & Website */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label htmlFor="location" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                            {t('location')}
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="location"
-                                            name="location"
-                                            value={formData.location}
-                                            onChange={handleChange}
-                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                            placeholder="Istanbul, Turkey"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="website" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                            {t('website')}
-                                        </label>
-                                        <input
-                                            type="url"
-                                            id="website"
-                                            name="website"
-                                            value={formData.website}
-                                            onChange={handleChange}
-                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                            placeholder="https://website.com"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex gap-3 justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
-                                    <button
-                                        type="button"
-                                        onClick={handleCancel}
-                                        className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                                    >
-                                        {t('cancel')}
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="px-6 py-2.5 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                    >
-                                        {loading ? (
-                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        ) : (
-                                            <>
-                                                <span className="material-symbols-outlined text-lg">save</span>
-                                                {t('save')}
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    )
+                    <>
+                        {currentTemplate === 'playful' && <PlayfulEditor onClose={() => setIsEditing(false)} />}
+                        {currentTemplate === 'neumorphic' && <NeumorphicEditor onClose={() => setIsEditing(false)} />}
+                        {currentTemplate === 'brutalist' && <BrutalistEditor onClose={() => setIsEditing(false)} />}
+                        {!['playful', 'neumorphic', 'brutalist'].includes(currentTemplate) && (
+                            <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                {/* Default Editor content... (keeping fallback for potential future themes) */}
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('editProfileTitle')}</h2>
+                                <p className="text-red-500">Editör yüklenemedi veya bu şablon için özel editör bulunamadı.</p>
+                                <button onClick={() => setIsEditing(false)} className="mt-4 px-4 py-2 bg-slate-200 rounded-lg">Kapat</button>
+                            </div>
+                        )}
+                    </>
                 )}
             </main>
         </div>

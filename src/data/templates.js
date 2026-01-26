@@ -13,6 +13,13 @@ export const templates = [
         description: 'Soft UI ve taktiksel dokunuşlar',
         preview: 'bg-[#bfbfbf]',
         isPremium: false
+    },
+    {
+        id: 'brutalist',
+        name: 'Brutalist',
+        description: 'Yüksek kontrast, neon ve ham tasarım',
+        preview: 'bg-[#230f1c]',
+        isPremium: false
     }
 ];
 

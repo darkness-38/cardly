@@ -52,6 +52,16 @@ export default function TemplateSelector({ currentTemplate, onSelect, user }) {
                                     <div className="mt-4 w-16 h-3 rounded-full bg-[#bfbfbf] shadow-[3px_3px_6px_#969696,-3px_-3px_6px_#dadada]"></div>
                                 </div>
                             )}
+                            {template.id === 'brutalist' && (
+                                <div className="h-full bg-[#230f1c] flex flex-col items-center justify-center border-4 border-[#f91fb1]">
+                                    <div className="w-12 h-12 bg-[#f91fb1] flex items-center justify-center text-white">
+                                        <span className="text-xl font-black">B</span>
+                                    </div>
+                                    <div className="mt-2 w-full h-4 bg-[#f91fb1]/20 overflow-hidden">
+                                        <div className="w-full h-full bg-[#f91fb1] animate-pulse"></div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Template Name */}
