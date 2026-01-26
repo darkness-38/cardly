@@ -48,6 +48,17 @@ export default function PlayfulTemplate({ user, links = [] }) {
                 <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-blue-200/30 dark:bg-blue-900/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
             </div>
 
+            {/* Made With Cardly Badge */}
+            <a
+                href="https://cardly.qzz.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fixed top-4 left-4 z-50 flex items-center gap-2 px-3 py-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-lg border border-amber-200 dark:border-amber-800 hover:scale-105 transition-transform"
+            >
+                <span className="text-amber-500 text-lg">✨</span>
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Made with Cardly</span>
+            </a>
+
             {/* Main Content */}
             <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
                 {/* Avatar Section */}

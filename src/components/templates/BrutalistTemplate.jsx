@@ -18,11 +18,18 @@ export default function BrutalistTemplate({ user, links = [] }) {
         <div className="min-h-screen flex flex-col font-sans bg-[#f8f5f7] dark:bg-[#230f1c] text-[#230f1c] dark:text-[#f8f5f7] selection:bg-[#f91fb1] selection:text-white overflow-x-hidden">
             {/* Top Navigation */}
             <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b-4 border-[#f91fb1] bg-[#230f1c] px-4 py-4 md:px-10">
-                <div className="flex items-center gap-4 text-white">
-                    <div className="flex size-10 items-center justify-center bg-[#f91fb1] text-white rounded-sm">
-                        <span className="material-symbols-outlined !text-[32px]">emergency</span>
-                    </div>
-                    <h2 className="text-white text-2xl font-black uppercase tracking-tighter">{user?.name || "[Creator Name]"}</h2>
+                <div className="flex items-center gap-4">
+                    <a
+                        href="https://cardly.qzz.io"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-[#f91fb1]/20 rounded-sm border border-[#f91fb1]/40 hover:bg-[#f91fb1]/30 transition-colors"
+                    >
+                        <span className="text-[#f91fb1] text-sm">✦</span>
+                        <span className="text-xs font-bold text-[#f91fb1] uppercase tracking-wider">Made with Cardly</span>
+                    </a>
+                    <div className="hidden md:block w-px h-6 bg-[#f91fb1]/30"></div>
+                    <h2 className="hidden md:block text-white text-xl font-black uppercase tracking-tighter">{user?.name || "[Creator Name]"}</h2>
                 </div>
 
                 <button className="sm:hidden text-[#f91fb1]">
