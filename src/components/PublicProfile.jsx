@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getTemplateComponent } from './templates';
+import { socialService } from '../services/socialService';
 
 export default function PublicProfile() {
     const { username } = useParams();
@@ -30,6 +31,9 @@ export default function PublicProfile() {
                         userLinks.push({ title: 'Website', url: userData.website });
                     }
                     setLinks(userLinks);
+
+                    // Increment views
+                    socialService.incrementProfileViews(userData.id);
                 } else {
                     // Try direct ID lookup as fallback
                     const userDoc = await getDoc(doc(db, 'users', username));
@@ -41,6 +45,9 @@ export default function PublicProfile() {
                             userLinks.push({ title: 'Website', url: userData.website });
                         }
                         setLinks(userLinks);
+
+                        // Increment views
+                        socialService.incrementProfileViews(userData.id);
                     } else {
                         setError('Kullanıcı bulunamadı');
                     }

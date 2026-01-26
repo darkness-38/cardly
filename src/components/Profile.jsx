@@ -8,6 +8,7 @@ import TemplateSelector from './TemplateSelector';
 import PlayfulEditor from './editors/PlayfulEditor';
 import NeumorphicEditor from './editors/NeumorphicEditor';
 import BrutalistEditor from './editors/BrutalistEditor';
+import AccountSettings from './AccountSettings';
 import { templates } from '../data/templates';
 
 export default function Profile() {
@@ -15,6 +16,7 @@ export default function Profile() {
     const { t, language } = useLanguage();
     const [isEditing, setIsEditing] = useState(false);
     const [showTemplates, setShowTemplates] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
@@ -208,7 +210,7 @@ export default function Profile() {
                             </p>
                         </div>
                         <button
-                            onClick={() => setIsEditing(true)}
+                            onClick={() => setShowSettings(true)}
                             className="px-4 py-2 rounded-xl bg-amber-600 text-white font-medium text-sm hover:bg-amber-700 transition-colors"
                         >
                             {language === 'tr' ? 'Oluştur' : 'Create'}
@@ -237,6 +239,13 @@ export default function Profile() {
                         {/* Edit Button */}
                         <div className="absolute top-4 right-4 flex gap-2">
                             <button
+                                onClick={() => setShowSettings(true)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+                            >
+                                <span className="material-symbols-outlined text-lg">manage_accounts</span>
+                                {language === 'tr' ? 'Ayarlar' : 'Settings'}
+                            </button>
+                            <button
                                 onClick={() => setShowTemplates(!showTemplates)}
                                 className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
                             >
@@ -249,7 +258,7 @@ export default function Profile() {
                                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary/90 transition-all hover:-translate-y-0.5 shadow-lg shadow-primary/20"
                                 >
                                     <span className="material-symbols-outlined text-lg">edit</span>
-                                    {t('edit')}
+                                    {language === 'tr' ? 'İçerik Düzenle' : 'Edit Content'}
                                 </button>
                             )}
                         </div>
@@ -325,17 +334,13 @@ export default function Profile() {
                 )}
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-2 gap-4 mb-8">
                     <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
-                        <div className="text-3xl font-bold text-primary mb-1">1</div>
+                        <div className="text-3xl font-bold text-primary mb-1">{user?.profileViews || 0}</div>
                         <div className="text-sm text-slate-500 dark:text-slate-400">{t('views')}</div>
                     </div>
                     <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
-                        <div className="text-3xl font-bold text-primary mb-1">0</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">{t('shares')}</div>
-                    </div>
-                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
-                        <div className="text-3xl font-bold text-primary mb-1">0</div>
+                        <div className="text-3xl font-bold text-primary mb-1">{user?.followersCount || 0}</div>
                         <div className="text-sm text-slate-500 dark:text-slate-400">{t('followers')}</div>
                     </div>
                 </div>
@@ -363,14 +368,17 @@ export default function Profile() {
                         {currentTemplate === 'brutalist' && <BrutalistEditor onClose={() => setIsEditing(false)} />}
                         {!['playful', 'neumorphic', 'brutalist'].includes(currentTemplate) && (
                             <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                {/* Default Editor content... (keeping fallback for potential future themes) */}
+                                {/* Default Editor content fallback */}
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('editProfileTitle')}</h2>
-                                <p className="text-red-500">Editör yüklenemedi veya bu şablon için özel editör bulunamadı.</p>
-                                <button onClick={() => setIsEditing(false)} className="mt-4 px-4 py-2 bg-slate-200 rounded-lg">Kapat</button>
+                                <p className="text-slate-500 mb-4">Please use "Settings" to edit your profile info, or select a theme to edit theme content.</p>
+                                <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-slate-200 rounded-lg">Close</button>
                             </div>
                         )}
                     </>
                 )}
+
+                {/* Account Settings Modal */}
+                {showSettings && <AccountSettings onClose={() => setShowSettings(false)} />}
             </main>
         </div>
     );

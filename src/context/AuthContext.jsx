@@ -151,6 +151,7 @@ export function AuthProvider({ children }) {
             // Update Firestore document
             await updateDoc(doc(db, 'users', user.id), {
                 name: updates.name,
+                username: updates.username,
                 bio: updates.bio,
                 location: updates.location,
                 website: updates.website,

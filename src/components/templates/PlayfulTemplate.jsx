@@ -1,4 +1,6 @@
 // Playful Illustrative Template - Floating bubbles and organic shapes
+import FollowButton from '../FollowButton';
+
 export default function PlayfulTemplate({ user, links = [] }) {
     const getInitials = (name) => {
         if (!name) return '?';
@@ -96,6 +98,26 @@ export default function PlayfulTemplate({ user, links = [] }) {
                             </p>
                         </div>
                     )}
+
+                    {/* Stats & Actions */}
+                    <div className="mt-8 flex flex-col items-center gap-6">
+                        <div className="flex items-center gap-8 bg-white/40 dark:bg-slate-800/40 p-3 rounded-2xl backdrop-blur-sm border border-white/40 dark:border-white/10">
+                            <div className="flex flex-col items-center px-4">
+                                <span className="text-2xl font-bold text-slate-800 dark:text-white">{user?.followersCount || 0}</span>
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Followers</span>
+                            </div>
+                            <div className="w-px h-8 bg-amber-200 dark:bg-amber-800"></div>
+                            <div className="flex flex-col items-center px-4">
+                                <span className="text-2xl font-bold text-slate-800 dark:text-white">{user?.followingCount || 0}</span>
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Following</span>
+                            </div>
+                        </div>
+
+                        <FollowButton
+                            targetUserId={user?.id}
+                            className="px-8 py-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-bold rounded-2xl shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:scale-105 transition-all duration-300 border-2 border-amber-200 dark:border-amber-800"
+                        />
+                    </div>
                 </div>
 
                 {/* Floating Link Bubbles */}

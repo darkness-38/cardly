@@ -12,12 +12,6 @@ export default function NeumorphicEditor({ onClose }) {
     const [error, setError] = useState('');
 
     const [formData, setFormData] = useState({
-        name: user?.name || '',
-        username: user?.username || '',
-        bio: user?.bio || '',
-        location: user?.location || '',
-        website: user?.website || '',
-        avatar: user?.avatar || '',
         links: user?.links || []
     });
 
@@ -36,13 +30,8 @@ export default function NeumorphicEditor({ onClose }) {
         { id: 'link', label: 'Link' },
     ];
 
-    const handleChange = (e) => {
-        let { name, value } = e.target;
-        if (name === 'username') {
-            value = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
-        }
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    // handleChange is no longer needed for text inputs if we only have links
+    // But if we have other inputs we might need it. For now, links are handled separately.
 
     const addLink = () => {
         if (newLink.title && newLink.url) {
@@ -78,19 +67,13 @@ export default function NeumorphicEditor({ onClose }) {
 
         try {
             await updateDoc(doc(db, 'users', user.id), {
-                name: formData.name,
-                username: formData.username?.toLowerCase() || '',
-                bio: formData.bio,
-                location: formData.location,
-                website: formData.website,
-                avatar: formData.avatar,
                 links: formData.links
             });
 
-            setSuccess(language === 'tr' ? 'Profil güncellendi!' : 'Profile updated!');
+            setSuccess(language === 'tr' ? 'Linkler güncellendi!' : 'Links updated!');
             setTimeout(() => {
                 onClose?.();
-            }, 1500);
+            }, 1000);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -144,179 +127,26 @@ export default function NeumorphicEditor({ onClose }) {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Avatar Section */}
+
+
+                <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900">
+                    <p className="text-sm text-blue-600 dark:text-blue-400">
+                        {language === 'tr'
+                            ? 'Profil bilgilerinizi (isim, bio, fotoğraf vb.) "Ayarlar" menüsünden düzenleyebilirsiniz.'
+                            : 'You can edit your profile info (name, bio, photo etc.) from the "Settings" menu.'}
+                    </p>
+                </div>
+
                 <div className="p-4 rounded-xl bg-[#bfbfbf] dark:bg-[#191919] shadow-[inset_3px_3px_6px_#969696,inset_-3px_-3px_6px_#dadada] dark:shadow-[inset_3px_3px_6px_#000000,inset_-3px_-3px_6px_#262626]">
-                    <h3 className="font-semibold text-[#2d2d2d] dark:text-[#e5e5e5] mb-4 flex items-center gap-2">
-                        <span className="material-symbols-outlined">face</span>
-                        {language === 'tr' ? 'Avatar' : 'Avatar'}
-                    </h3>
-                    <div className="flex items-start gap-4">
-                        <div className="w-20 h-20 rounded-full bg-[#bfbfbf] dark:bg-[#191919] shadow-[5px_5px_10px_#969696,-5px_-5px_10px_#dadada] dark:shadow-[5px_5px_10px_#000000,-5px_-5px_10px_#262626] flex items-center justify-center text-2xl font-bold text-[#525252] border-4 border-[#bfbfbf] dark:border-[#191919] shrink-0 overflow-hidden">
-                            {formData.avatar ? (
-                                <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                                getInitials(formData.name)
-                            )}
-                        </div>
-                        <div className="flex-1">
-                            <input
-                                type="url"
-                                name="avatar"
-                                value={formData.avatar}
-                                onChange={handleChange}
-                                className={inputStyle}
-                                placeholder="Avatar URL"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Basic Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-[#525252] dark:text-[#a3a3a3] mb-2">
-                            {language === 'tr' ? 'Kullanıcı Adı' : 'Username'}
-                        </label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">@</span>
-                            <input
-                                type="text"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                className={`${inputStyle} pl-8`}
-                                placeholder="username"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-[#525252] dark:text-[#a3a3a3] mb-2">
-                            {language === 'tr' ? 'İsim' : 'Name'}
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className={inputStyle}
-                            placeholder="Full Name"
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-[#525252] dark:text-[#a3a3a3] mb-2">
-                        {language === 'tr' ? 'Konum' : 'Location'}
-                    </label>
-                    <input
-                        type="text"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleChange}
-                        className={inputStyle}
-                        placeholder="City, Country"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-[#525252] dark:text-[#a3a3a3] mb-2">
-                        {language === 'tr' ? 'Hakkında' : 'About'}
-                    </label>
-                    <textarea
-                        name="bio"
-                        value={formData.bio}
-                        onChange={handleChange}
-                        rows={2}
-                        className={`${inputStyle} h-auto py-3 resize-none`}
-                        placeholder="Bio..."
-                    />
-                </div>
-
-                {/* Links Section */}
-                <div className="p-4 rounded-xl bg-[#bfbfbf] dark:bg-[#191919] shadow-[inset_3px_3px_6px_#969696,inset_-3px_-3px_6px_#dadada] dark:shadow-[inset_3px_3px_6px_#000000,inset_-3px_-3px_6px_#262626]">
-                    <h3 className="font-semibold text-[#2d2d2d] dark:text-[#e5e5e5] mb-4 flex items-center gap-2">
+                    <h3 className="font-semibold text-[#2d2d2d] dark:text-[#e5e5e5] mb-2 flex items-center gap-2">
                         <span className="material-symbols-outlined">link</span>
                         {language === 'tr' ? 'Linkler' : 'Links'}
                     </h3>
-
-                    {/* Existing Links */}
-                    <div className="space-y-3 mb-4">
-                        {formData.links.map((link, index) => (
-                            <div key={link.id || index} className="flex items-center gap-2 p-3 rounded-xl bg-[#bfbfbf] dark:bg-[#191919] shadow-[5px_5px_10px_#969696,-5px_-5px_10px_#dadada] dark:shadow-[5px_5px_10px_#000000,-5px_-5px_10px_#262626]">
-                                <span className="material-symbols-outlined text-[#525252]">{link.icon}</span>
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-bold text-sm text-[#2d2d2d] dark:text-[#e5e5e5] truncate">{link.title}</p>
-                                    <p className="text-xs text-[#525252] truncate">{link.url}</p>
-                                </div>
-                                <div className="flex gap-1">
-                                    <button type="button" onClick={() => moveLink(index, -1)} disabled={index === 0} className="w-8 h-8 rounded-full flex items-center justify-center text-[#525252] hover:bg-black/5 disabled:opacity-30">
-                                        <span className="material-symbols-outlined text-sm">arrow_upward</span>
-                                    </button>
-                                    <button type="button" onClick={() => moveLink(index, 1)} disabled={index === formData.links.length - 1} className="w-8 h-8 rounded-full flex items-center justify-center text-[#525252] hover:bg-black/5 disabled:opacity-30">
-                                        <span className="material-symbols-outlined text-sm">arrow_downward</span>
-                                    </button>
-                                    <button type="button" onClick={() => removeLink(link.id)} className="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-500/10">
-                                        <span className="material-symbols-outlined text-sm">delete</span>
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Add New Link */}
-                    <div className="space-y-3">
-                        <div className="flex gap-2">
-                            <select
-                                value={newLink.icon}
-                                onChange={(e) => setNewLink(prev => ({ ...prev, icon: e.target.value }))}
-                                className={`${inputStyle} w-1/3`}
-                            >
-                                {iconOptions.map((icon) => (
-                                    <option key={icon.id} value={icon.id}>{icon.label}</option>
-                                ))}
-                            </select>
-                            <input
-                                type="text"
-                                value={newLink.title}
-                                onChange={(e) => setNewLink(prev => ({ ...prev, title: e.target.value }))}
-                                className={`${inputStyle} w-2/3`}
-                                placeholder={language === 'tr' ? 'Başlık' : 'Title'}
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <input
-                                type="url"
-                                value={newLink.url}
-                                onChange={(e) => setNewLink(prev => ({ ...prev, url: e.target.value }))}
-                                className={inputStyle}
-                                placeholder="https://..."
-                            />
-                            <button
-                                type="button"
-                                onClick={addLink}
-                                disabled={!newLink.title || !newLink.url}
-                                className={`${buttonStyle} !px-4 !py-0 flex items-center justify-center`}
-                            >
-                                <span className="material-symbols-outlined">add</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Website */}
-                <div>
-                    <label className="block text-sm font-medium text-[#525252] dark:text-[#a3a3a3] mb-2">
-                        {language === 'tr' ? 'Website' : 'Website'}
-                    </label>
-                    <input
-                        type="url"
-                        name="website"
-                        value={formData.website}
-                        onChange={handleChange}
-                        className={inputStyle}
-                        placeholder="https://mywebsite.com"
-                    />
+                    <p className="text-sm text-[#525252]">
+                        {language === 'tr'
+                            ? 'Linklerinizi Dashboard üzerinden "Linkler" menüsünden yönetebilirsiniz.'
+                            : 'You can manage your links from the "Links" menu on the Dashboard.'}
+                    </p>
                 </div>
 
                 {/* Actions */}

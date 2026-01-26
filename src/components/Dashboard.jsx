@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from './Navbar';
+import LinksSettings from './LinksSettings';
 
 export default function Dashboard() {
     const { user } = useAuth();
     const { t } = useLanguage();
+    const [showLinksSettings, setShowLinksSettings] = useState(false);
 
     const getInitials = (name) => {
         if (!name) return '?';
@@ -94,18 +97,21 @@ export default function Dashboard() {
                             </span>
                         </Link>
 
-                        <div className="group flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 opacity-60">
-                            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                        <button
+                            onClick={() => setShowLinksSettings(true)}
+                            className="group flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-purple-500/50 hover:shadow-lg transition-all hover:-translate-y-1 text-left w-full"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
                                 <span className="material-symbols-outlined text-2xl">link</span>
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-semibold text-slate-900 dark:text-white">{t('links')}</h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400">{t('socialLinks')}</p>
-                                <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded">
-                                    {t('comingSoon')}
-                                </span>
                             </div>
-                        </div>
+                            <span className="material-symbols-outlined text-slate-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all">
+                                chevron_right
+                            </span>
+                        </button>
                     </div>
                 </div>
 
@@ -184,6 +190,9 @@ export default function Dashboard() {
                     </div>
                 </div>
             </main>
+
+            {/* Links Settings Modal */}
+            {showLinksSettings && <LinksSettings onClose={() => setShowLinksSettings(false)} />}
         </div>
     );
 }

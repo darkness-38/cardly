@@ -1,5 +1,6 @@
 // Brutalist Template - Raw, high contrast, bold typography
 import { useLanguage } from '../../context/LanguageContext';
+import FollowButton from '../FollowButton';
 
 export default function BrutalistTemplate({ user, links = [] }) {
     const { t } = useLanguage();
@@ -55,9 +56,29 @@ export default function BrutalistTemplate({ user, links = [] }) {
                             <h2 className="text-white text-4xl font-black uppercase italic tracking-tighter leading-none mb-2">
                                 Creator<br />Profile
                             </h2>
-                            <p className="text-[#f91fb1] font-bold tracking-widest text-sm uppercase">
+                            <p className="text-[#f91fb1] font-bold tracking-widest text-sm uppercase mb-4">
                                 {user?.location ? `Based in ${user.location.split(',')[0]}` : 'Based in Digital'}
                             </p>
+
+                            {/* Stats & Actions */}
+                            <div className="flex items-end justify-between gap-4">
+                                <div className="flex gap-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-white font-black text-2xl leading-none">{user?.followersCount || 0}</span>
+                                        <span className="text-[#f91fb1] text-[10px] font-mono uppercase">Followers</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-white font-black text-2xl leading-none">{user?.followingCount || 0}</span>
+                                        <span className="text-[#f91fb1] text-[10px] font-mono uppercase">Following</span>
+                                    </div>
+                                </div>
+
+                                <FollowButton
+                                    targetUserId={user?.id}
+                                    className="px-4 py-2 bg-[#f91fb1] text-white font-black uppercase tracking-widest border-2 border-transparent hover:bg-white hover:text-[#230f1c] hover:border-[#230f1c] transition-all text-sm"
+                                />
+                            </div>
+
                             {user?.location && (
                                 <div className="mt-4 inline-flex items-center gap-2 border border-[#f91fb1] px-3 py-1 rounded-sm bg-[#230f1c]/50 backdrop-blur-sm">
                                     <span className="material-symbols-outlined text-[#f91fb1] text-sm">location_on</span>
