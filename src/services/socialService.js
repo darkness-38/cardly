@@ -26,12 +26,21 @@ export const socialService = {
 
         try {
             await runTransaction(db, async (transaction) => {
-                // Check if already following
+                // READS FIRST
                 const relationshipDoc = await transaction.get(relationshipRef);
+                const currentUserDoc = await transaction.get(currentUserRef);
+                const targetUserDoc = await transaction.get(targetUserRef);
+
+                // LOGIC CHECKS
                 if (relationshipDoc.exists()) {
                     throw new Error('Already following');
                 }
 
+                if (!currentUserDoc.exists() || !targetUserDoc.exists()) {
+                    throw new Error('User not found');
+                }
+
+                // WRITES
                 // Create relationship
                 transaction.set(relationshipRef, {
                     followerId: currentUserId,
@@ -40,20 +49,6 @@ export const socialService = {
                 });
 
                 // Update counts
-                // Note: Firestore doesn't support atomic increment in transactions for set() but we can read and update.
-                // Or better, use update() with increment if document exists, but here we want to be safe.
-                // Let's use clean read-modify-write or atomic Increment.
-                // Atomic increment is cleaner: 
-                // transaction.update(ref, { field: increment(1) });
-                // But we need to ensure docs exist.
-
-                const currentUserDoc = await transaction.get(currentUserRef);
-                const targetUserDoc = await transaction.get(targetUserRef);
-
-                if (!currentUserDoc.exists() || !targetUserDoc.exists()) {
-                    throw new Error('User not found');
-                }
-
                 const newFollowingCount = (currentUserDoc.data().followingCount || 0) + 1;
                 const newFollowersCount = (targetUserDoc.data().followersCount || 0) + 1;
 
@@ -78,18 +73,21 @@ export const socialService = {
 
         try {
             await runTransaction(db, async (transaction) => {
+                // READS
                 const relationshipDoc = await transaction.get(relationshipRef);
+                const currentUserDoc = await transaction.get(currentUserRef);
+                const targetUserDoc = await transaction.get(targetUserRef);
+
+                // CHECKS
                 if (!relationshipDoc.exists()) {
                     throw new Error('Not following');
                 }
 
+                // WRITES
                 // Delete relationship
                 transaction.delete(relationshipRef);
 
                 // Update counts
-                const currentUserDoc = await transaction.get(currentUserRef);
-                const targetUserDoc = await transaction.get(targetUserRef);
-
                 if (currentUserDoc.exists()) {
                     const newFollowingCount = Math.max(0, (currentUserDoc.data().followingCount || 0) - 1);
                     transaction.update(currentUserRef, { followingCount: newFollowingCount });

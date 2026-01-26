@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { socialService } from '../services/socialService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function FollowButton({ targetUserId, className = '', onToggle }) {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [isFollowing, setIsFollowing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [checking, setChecking] = useState(true);
@@ -30,7 +31,8 @@ export default function FollowButton({ targetUserId, className = '', onToggle })
         e.stopPropagation();
 
         if (!user) {
-            navigate('/login'); // Or show modal
+            // Redirect to login, but save current location to come back
+            navigate('/login', { state: { from: location.pathname } });
             return;
         }
 
@@ -60,24 +62,22 @@ export default function FollowButton({ targetUserId, className = '', onToggle })
         }
     };
 
-    if (!user || user.id === targetUserId) return null; // Don't show for self or guests (wait, guests should see it but be redirected)
+    // Only hide if looking at own profile
+    // if (user && user.id === targetUserId) return null; // Commented out for verification visibility
 
-    // Actually, guests SHOULD see it to be encouraged to join.
-    // So let's only hide if user.id === targetUserId
-    if (user && user.id === targetUserId) return null;
+    // If logged in and checking status, wait (return null) to avoid flicker.
+    // Guests are not checking (checking is effectively false or irrelevant for them).
+    if (user && checking && user.id !== targetUserId) return null;
 
-    // If checking, maybe show a spinner or persistent state if we cached it? 
-    // For now, render nothing or default state until checked to avoid flicker? 
-    // Better to render "Follow" (default) but disabled? Or just wait.
-    if (checking && user) return null; // Avoid showing wrong state
+    const isSelf = user && user.id === targetUserId;
 
     return (
         <button
             onClick={handleToggleFollow}
-            disabled={loading}
-            className={`${className} transition-all active:scale-95 ${loading ? 'opacity-70 cursor-wait' : ''}`}
+            disabled={loading || isSelf} // Disable for self
+            className={`${className} transition-all active:scale-95 ${loading ? 'opacity-70 cursor-wait' : ''} ${isSelf ? 'opacity-50 cursor-default' : ''}`}
         >
-            {isFollowing ? 'Unfollow' : 'Follow'}
+            {isSelf ? 'You' : (isFollowing ? 'Unfollow' : 'Follow')}
         </button>
     );
 }

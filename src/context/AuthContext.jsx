@@ -8,7 +8,7 @@ import {
     GoogleAuthProvider,
     signInWithPopup
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 const AuthContext = createContext(null);
@@ -19,33 +19,54 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (firebaseUser) {
-                // Get additional user data from Firestore
-                const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-                const userData = userDoc.exists() ? userDoc.data() : {};
+        let firestoreUnsubscribe = null;
 
-                setUser({
-                    id: firebaseUser.uid,
-                    email: firebaseUser.email,
-                    name: firebaseUser.displayName || userData.name || '',
-                    username: userData.username || '',
-                    bio: userData.bio || '',
-                    avatar: firebaseUser.photoURL || userData.avatar || '',
-                    location: userData.location || '',
-                    website: userData.website || '',
-                    template: userData.template || 'playful',
-                    badge: userData.badge || '✨',
-                    links: userData.links || [],
-                    createdAt: userData.createdAt || firebaseUser.metadata.creationTime
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firestoreUnsubscribe) {
+                firestoreUnsubscribe();
+                firestoreUnsubscribe = null;
+            }
+
+            if (firebaseUser) {
+                // Listen to real-time updates from Firestore
+                firestoreUnsubscribe = onSnapshot(doc(db, 'users', firebaseUser.uid), (docSnapshot) => {
+                    const userData = docSnapshot.exists() ? docSnapshot.data() : {};
+
+                    setUser({
+                        id: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        name: userData.name || firebaseUser.displayName || '',
+                        username: userData.username || '',
+                        bio: userData.bio || '',
+                        avatar: userData.avatar || firebaseUser.photoURL || '',
+                        location: userData.location || '',
+                        website: userData.website || '',
+                        template: userData.template || 'playful',
+                        badge: userData.badge || '✨',
+                        links: userData.links || [],
+                        followersCount: userData.followersCount || 0,
+                        followingCount: userData.followingCount || 0,
+                        profileViews: userData.profileViews || 0,
+                        marqueeText: userData.marqueeText || 'Digital Designer /// Frontend Wizard /// Based in Tokyo',
+                        createdAt: userData.createdAt || firebaseUser.metadata.creationTime
+                    });
+                    setLoading(false);
+                }, (error) => {
+                    console.error("Firestore listen error:", error);
+                    setLoading(false);
                 });
             } else {
                 setUser(null);
+                setLoading(false);
             }
-            setLoading(false);
         });
 
-        return () => unsubscribe();
+        return () => {
+            if (firestoreUnsubscribe) {
+                firestoreUnsubscribe();
+            }
+            unsubscribe();
+        };
     }, []);
 
     const register = async (email, password, name) => {
