@@ -1,15 +1,21 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import Navbar from './Navbar';
+import TemplateSelector from './TemplateSelector';
+import { templates } from '../data/templates';
 
 export default function Profile() {
     const { user, updateProfile } = useAuth();
     const { t, language } = useLanguage();
     const [isEditing, setIsEditing] = useState(false);
+    const [showTemplates, setShowTemplates] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const [currentTemplate, setCurrentTemplate] = useState(user?.template || 'minimal');
 
     const [formData, setFormData] = useState({
         name: user?.name || '',
@@ -41,6 +47,21 @@ export default function Profile() {
         }
     };
 
+    const handleTemplateSelect = async (templateId) => {
+        try {
+            setCurrentTemplate(templateId);
+            if (user?.id) {
+                await updateDoc(doc(db, 'users', user.id), {
+                    template: templateId
+                });
+                setSuccess(language === 'tr' ? 'Şablon güncellendi!' : 'Template updated!');
+            }
+        } catch (err) {
+            console.error('Template update error:', err);
+            setError(language === 'tr' ? 'Şablon güncellenemedi' : 'Failed to update template');
+        }
+    };
+
     const handleCancel = () => {
         setFormData({
             name: user?.name || '',
@@ -57,6 +78,8 @@ export default function Profile() {
         if (!name) return '?';
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     };
+
+    const currentTemplateData = templates.find(t => t.id === currentTemplate) || templates[0];
 
     const memberSince = user?.createdAt
         ? new Date(user.createdAt).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long' })
@@ -86,7 +109,14 @@ export default function Profile() {
                         </div>
 
                         {/* Edit Button */}
-                        <div className="absolute top-4 right-4">
+                        <div className="absolute top-4 right-4 flex gap-2">
+                            <button
+                                onClick={() => setShowTemplates(!showTemplates)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+                            >
+                                <span className="material-symbols-outlined text-lg">palette</span>
+                                {language === 'tr' ? 'Şablon' : 'Template'}
+                            </button>
                             {!isEditing && (
                                 <button
                                     onClick={() => setIsEditing(true)}
@@ -137,6 +167,33 @@ export default function Profile() {
                         </div>
                     </div>
                 </div>
+
+                {/* Template Selector */}
+                {showTemplates && (
+                    <div className="mb-8 p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    {language === 'tr' ? 'Şablon Seç' : 'Choose Template'}
+                                </h2>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                    {language === 'tr' ? 'Aktif: ' : 'Active: '}{currentTemplateData.name}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setShowTemplates(false)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <TemplateSelector
+                            currentTemplate={currentTemplate}
+                            onSelect={handleTemplateSelect}
+                            user={user}
+                        />
+                    </div>
+                )}
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mb-8">
