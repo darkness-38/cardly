@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
                         links: userData.links || [],
                         followersCount: userData.followersCount || 0,
                         followingCount: userData.followingCount || 0,
-                        profileViews: userData.profileViews || 0,
+                        profileViews: userData.profileViews || userData.views || 0,
                         marqueeText: userData.marqueeText || 'Digital Designer /// Frontend Wizard /// Based in Tokyo',
                         createdAt: userData.createdAt || firebaseUser.metadata.creationTime
                     });

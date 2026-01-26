@@ -28,6 +28,7 @@ export default function LinksSettings({ onClose }) {
         { id: 'music_note', label: 'Music' },
         { id: 'link', label: 'Link' },
         { id: 'smart_display', label: 'YouTube' },
+        { id: 'graphic_eq', label: 'TikTok' },
         { id: 'podcasts', label: 'Podcast' },
         { id: 'alternate_email', label: 'Contact' },
         { id: 'description', label: 'Resume' },
