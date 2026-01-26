@@ -4,12 +4,15 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    updateProfile as firebaseUpdateProfile
+    updateProfile as firebaseUpdateProfile,
+    GoogleAuthProvider,
+    signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 const AuthContext = createContext(null);
+const googleProvider = new GoogleAuthProvider();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -93,6 +96,39 @@ export function AuthProvider({ children }) {
         }
     };
 
+    const loginWithGoogle = async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const firebaseUser = result.user;
+
+            // Check if user document exists, if not create it
+            const userDocRef = doc(db, 'users', firebaseUser.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (!userDoc.exists()) {
+                await setDoc(userDocRef, {
+                    name: firebaseUser.displayName || '',
+                    email: firebaseUser.email,
+                    bio: '',
+                    avatar: firebaseUser.photoURL || '',
+                    location: '',
+                    website: '',
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            return firebaseUser;
+        } catch (error) {
+            let message = 'Google ile giriş sırasında bir hata oluştu';
+            if (error.code === 'auth/popup-closed-by-user') {
+                message = 'Giriş penceresi kapatıldı';
+            } else if (error.code === 'auth/popup-blocked') {
+                message = 'Popup engellenmiş. Lütfen popup engelleyicisini devre dışı bırakın';
+            }
+            throw new Error(message);
+        }
+    };
+
     const logout = async () => {
         try {
             await signOut(auth);
@@ -143,6 +179,7 @@ export function AuthProvider({ children }) {
         loading,
         register,
         login,
+        loginWithGoogle,
         logout,
         updateProfile,
         isAuthenticated: !!user
