@@ -11,7 +11,7 @@ import AccountSettings from './AccountSettings';
 import { templates } from '../data/templates';
 
 export default function Profile() {
-    const { user, updateProfile } = useAuth();
+    const { user, updateProfile, refreshUser } = useAuth();
     const { t, language } = useLanguage();
     const [isEditing, setIsEditing] = useState(false);
     const [showTemplates, setShowTemplates] = useState(false);
@@ -334,9 +334,14 @@ export default function Profile() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 mb-8">
-                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                    <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center relative group">
                         <div className="text-3xl font-bold text-primary mb-1">{user?.profileViews || user?.views || 0}</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">{t('views')}</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1">
+                            {t('views')}
+                            <button onClick={() => refreshUser && refreshUser()} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded-full" title="Refresh">
+                                <span className="material-symbols-outlined text-[10px]">refresh</span>
+                            </button>
+                        </div>
                     </div>
                     <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
                         <div className="text-3xl font-bold text-primary mb-1">{user?.followersCount || 0}</div>

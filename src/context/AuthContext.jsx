@@ -201,6 +201,26 @@ export function AuthProvider({ children }) {
         }
     };
 
+    const refreshUser = async () => {
+        if (!user) return;
+        try {
+            const userDoc = await getDoc(doc(db, 'users', user.id));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                setUser(prev => ({
+                    ...prev,
+                    id: user.id, // Ensure ID is preserved
+                    ...userData,
+                    profileViews: userData.profileViews || userData.views || 0,
+                    followersCount: userData.followersCount || 0,
+                    followingCount: userData.followingCount || 0
+                }));
+            }
+        } catch (error) {
+            console.error("Manual refresh error:", error);
+        }
+    };
+
     const value = {
         user,
         loading,
@@ -209,6 +229,7 @@ export function AuthProvider({ children }) {
         loginWithGoogle,
         logout,
         updateProfile,
+        refreshUser,
         isAuthenticated: !!user
     };
 
