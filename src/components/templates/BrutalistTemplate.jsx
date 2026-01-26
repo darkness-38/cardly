@@ -23,9 +23,7 @@ export default function BrutalistTemplate({ user, links = [] }) {
                     </div>
                     <h2 className="text-white text-2xl font-black uppercase tracking-tighter">{user?.name || "[Creator Name]"}</h2>
                 </div>
-                <button className="hidden sm:flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-sm h-10 px-6 bg-white text-[#230f1c] hover:bg-[#f91fb1] hover:text-white transition-colors duration-200 text-sm font-black uppercase tracking-widest border-2 border-transparent hover:border-white">
-                    <span className="truncate">Available for work</span>
-                </button>
+
                 <button className="sm:hidden text-[#f91fb1]">
                     <span className="material-symbols-outlined !text-4xl">menu</span>
                 </button>
@@ -101,7 +99,7 @@ export default function BrutalistTemplate({ user, links = [] }) {
                             <div className="border-b-4 border-[#f91fb1]">
                                 <a href={user.website} target="_blank" rel="noopener noreferrer" className="group relative w-full h-32 bg-[#f91fb1] flex items-center justify-center overflow-hidden hover:bg-white transition-colors duration-300">
                                     <span className="relative z-10 text-[#230f1c] text-4xl md:text-5xl font-black uppercase tracking-tighter group-hover:text-[#f91fb1] transition-colors">
-                                        View Portfolio
+                                        Visit Website
                                     </span>
                                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-multiply"></div>
                                     <span className="material-symbols-outlined absolute right-8 text-6xl text-[#230f1c]/20 group-hover:text-[#f91fb1]/20 transition-all group-hover:rotate-45 group-hover:scale-125">
