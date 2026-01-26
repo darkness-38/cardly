@@ -115,40 +115,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="mb-8">
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('overview')}</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3">
-                                <span className="material-symbols-outlined">visibility</span>
-                            </div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white">1</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('views')}</div>
-                        </div>
-                        <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 mb-3">
-                                <span className="material-symbols-outlined">description</span>
-                            </div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{user?.bio ? '1' : '0'}</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('bio')}</div>
-                        </div>
-                        <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                            <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-3">
-                                <span className="material-symbols-outlined">location_on</span>
-                            </div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{user?.location ? '✓' : '–'}</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('location')}</div>
-                        </div>
-                        <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                            <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 mb-3">
-                                <span className="material-symbols-outlined">language</span>
-                            </div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-white">{user?.website ? '✓' : '–'}</div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">{t('website')}</div>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Profile Completion */}
                 <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
