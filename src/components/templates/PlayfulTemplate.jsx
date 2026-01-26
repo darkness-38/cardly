@@ -125,49 +125,51 @@ export default function PlayfulTemplate({ user, links = [] }) {
                     </div>
                 </div>
 
-                {/* Floating Link Bubbles */}
-                <div className="relative w-full max-w-2xl h-64 md:h-80">
-                    {(user?.links || links).map((link, index) => {
-                        const color = bubbleColors[index % bubbleColors.length];
-                        const blob = blobStyles[index % blobStyles.length];
-                        const positions = [
-                            'top-0 left-0 md:left-8',
-                            'top-4 right-0 md:right-8',
-                            'bottom-0 left-8 md:left-16',
-                            'bottom-8 right-4 md:right-20',
-                            'top-1/2 left-1/4',
-                            'top-1/3 right-1/4',
-                        ];
-                        const sizes = [
-                            'w-28 h-28 md:w-36 md:h-36',
-                            'w-24 h-24 md:w-32 md:h-32',
-                            'w-32 h-32 md:w-40 md:h-40',
-                            'w-26 h-26 md:w-34 md:h-34',
-                        ];
+                {/* Link Bubbles Grid */}
+                <div className="w-full max-w-2xl px-4">
+                    <div className="flex flex-wrap justify-center items-center">
+                        {(user?.links || links).map((link, index) => {
+                            const color = bubbleColors[index % bubbleColors.length];
+                            const blob = blobStyles[index % blobStyles.length];
 
-                        return (
-                            <a
-                                key={link.id || index}
-                                href={formatUrl(link)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`group absolute ${positions[index % positions.length]} ${sizes[index % sizes.length]} flex flex-col items-center justify-center ${color.bg} text-slate-800 dark:text-white ${blob} shadow-lg hover:shadow-xl hover:scale-110 hover:z-50 transition-all duration-300`}
-                                style={{
-                                    animation: `pulse ${4 + index}s ease-in-out infinite`,
-                                    animationDelay: `${index * 0.5}s`
-                                }}
-                            >
-                                <span className={`material-symbols-outlined text-3xl mb-2 group-hover:rotate-12 transition-transform duration-300 ${color.icon}`}>
-                                    {link.icon || (index === 0 ? 'palette' : index === 1 ? 'storefront' : index === 2 ? 'play_circle' : 'language')}
-                                </span>
-                                <span className="font-bold text-sm md:text-base text-center px-2">{link.title}</span>
-                            </a>
-                        );
-                    })}
+                            // Varying sizes based on index
+                            const sizeClasses = [
+                                'w-28 h-28 md:w-40 md:h-40',
+                                'w-24 h-24 md:w-32 md:h-32',
+                                'w-32 h-32 md:w-44 md:h-44',
+                                'w-26 h-26 md:w-36 md:h-36',
+                                'w-28 h-28 md:w-38 md:h-38',
+                            ];
 
-                    {/* Default bubbles if no links */}
-                    {links.length === 0 && (
-                        <div className="flex items-center justify-center h-full">
+                            // Varying margins for organic spacing
+                            const marginClasses = [
+                                'm-2 md:m-3',
+                                'm-3 md:m-4',
+                                'm-1 md:m-2',
+                                'm-4 md:m-5',
+                                'm-2 md:m-4',
+                            ];
+
+                            return (
+                                <a
+                                    key={link.id || index}
+                                    href={formatUrl(link)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`group flex flex-col items-center justify-center ${sizeClasses[index % sizeClasses.length]} ${marginClasses[index % marginClasses.length]} ${color.bg} text-slate-800 dark:text-white ${blob} shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300`}
+                                >
+                                    <span className={`material-symbols-outlined text-2xl md:text-3xl mb-1 md:mb-2 group-hover:rotate-12 transition-transform duration-300 ${color.icon}`}>
+                                        {link.icon || 'link'}
+                                    </span>
+                                    <span className="font-bold text-xs md:text-sm text-center px-2 leading-tight">{link.title}</span>
+                                </a>
+                            );
+                        })}
+                    </div>
+
+                    {/* Default message if no links */}
+                    {(user?.links || links).length === 0 && (
+                        <div className="flex items-center justify-center py-12">
                             <p className="text-slate-400 text-center">Henüz bağlantı eklenmemiş</p>
                         </div>
                     )}
