@@ -134,7 +134,14 @@ export default function AccountSettings({ onClose }) {
 
             const data = await response.json();
 
-            setFormData(prev => ({ ...prev, avatar: data.secure_url }));
+            // Apply Cloudinary transformations for optimization
+            // w_500 = width 500px, q_auto:best = best quality auto, f_auto = auto format (WebP/AVIF)
+            const optimizedUrl = data.secure_url.replace(
+                '/upload/',
+                '/upload/w_500,c_fill,q_auto:best,f_auto/'
+            );
+
+            setFormData(prev => ({ ...prev, avatar: optimizedUrl }));
             setSuccess(language === 'tr' ? 'Fotoğraf yüklendi!' : 'Photo uploaded!');
             setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
@@ -293,6 +300,9 @@ export default function AccountSettings({ onClose }) {
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                     {language === 'tr' ? 'Website' : 'Website'}
+                                    <span className="text-slate-400 font-normal ml-1">
+                                        ({language === 'tr' ? 'İsteğe bağlı' : 'Optional'})
+                                    </span>
                                 </label>
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-[18px]">language</span>
