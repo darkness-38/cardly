@@ -87,6 +87,9 @@ export default function AccountSettings({ onClose }) {
         if (!name) return '?';
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     };
+
+    // Cloudinary Configuration
+    const CLOUDINARY_CLOUD_NAME = 'daoagmsyt';
     const CLOUDINARY_UPLOAD_PRESET = 'avatarpfp';
 
     const handleImageUpload = async (e) => {
