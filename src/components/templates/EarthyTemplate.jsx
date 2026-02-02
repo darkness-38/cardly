@@ -9,6 +9,10 @@ export default function EarthyTemplate({ user, links = [] }) {
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     };
 
+    // Split links: first 4 for floating, rest for footer
+    const floatingLinks = links.slice(0, 4);
+    const extraLinks = links.slice(4);
+
     return (
         <div className="font-display bg-[#f2efeb] dark:bg-[#221510] text-[#3d342f] dark:text-[#fcf9f8] min-h-screen flex flex-col relative overflow-x-hidden transition-colors duration-300">
             {/* Texture Overlay */}
@@ -66,15 +70,15 @@ export default function EarthyTemplate({ user, links = [] }) {
                             rel="noopener noreferrer"
                             className="group flex items-center gap-2 bg-[#ee5b2b] hover:bg-[#d64a1f] text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-[#ee5b2b]/20 transition-all hover:scale-105 active:scale-95 mb-8"
                         >
-                            <span>{language === 'tr' ? 'Websitemi Ziyaret Et' : 'Visit My Website'}</span>
+                            <span>Visit My Website</span>
                             <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </a>
                     )}
                 </div>
 
-                {/* Floating Links */}
+                {/* Floating Links - First 4 only */}
                 <div className="w-full flex flex-col gap-4 mt-8 md:mt-0 md:absolute md:inset-0 md:pointer-events-none">
-                    {links.map((link, index) => {
+                    {floatingLinks.map((link, index) => {
                         const positions = [
                             'md:top-[15%] md:left-[10%] lg:left-[15%]',
                             'md:top-[20%] md:right-[10%] lg:right-[15%]',
@@ -87,8 +91,8 @@ export default function EarthyTemplate({ user, links = [] }) {
                             { bg: 'bg-[#e6decb]/30 dark:bg-white/10', text: 'text-[#3d342f] dark:text-white', label: 'text-stone-400' },
                             { bg: 'bg-[#ee5b2b]/10', text: 'text-[#ee5b2b]', label: 'text-[#ee5b2b]' },
                         ];
-                        const position = positions[index % positions.length];
-                        const color = colors[index % colors.length];
+                        const position = positions[index];
+                        const color = colors[index];
 
                         return (
                             <a
@@ -120,6 +124,24 @@ export default function EarthyTemplate({ user, links = [] }) {
             {/* Footer */}
             <footer className="w-full relative z-20 py-8">
                 <div className="max-w-md mx-auto px-4">
+                    {/* Extra Links as Round Buttons */}
+                    {extraLinks.length > 0 && (
+                        <div className="flex justify-center gap-3 flex-wrap mb-6">
+                            {extraLinks.map((link, index) => (
+                                <a
+                                    key={link.id || `extra-${index}`}
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-12 h-12 flex items-center justify-center rounded-full bg-white dark:bg-[#33251f] text-[#3d342f] dark:text-white shadow-md hover:shadow-lg hover:scale-110 transition-all border border-stone-200 dark:border-white/10"
+                                    title={link.title}
+                                >
+                                    <span className="material-symbols-outlined text-xl">{link.icon || 'link'}</span>
+                                </a>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Made with Cardly - Bottom */}
                     <a
                         href="https://cardly.qzz.io"
@@ -135,3 +157,4 @@ export default function EarthyTemplate({ user, links = [] }) {
         </div>
     );
 }
+

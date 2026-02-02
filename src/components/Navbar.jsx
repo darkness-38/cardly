@@ -1,10 +1,12 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar() {
     const { user, logout, isAuthenticated } = useAuth();
     const { t, language, toggleLanguage } = useLanguage();
+    const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -37,8 +39,8 @@ export default function Navbar() {
                                 <Link
                                     to="/dashboard"
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/dashboard')
-                                            ? 'bg-primary/10 text-primary'
-                                            : 'text-slate-600 hover:text-primary hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'text-slate-600 hover:text-primary hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                                         }`}
                                 >
                                     <span className="material-symbols-outlined text-lg">home</span>
@@ -47,8 +49,8 @@ export default function Navbar() {
                                 <Link
                                     to="/profile"
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/profile')
-                                            ? 'bg-primary/10 text-primary'
-                                            : 'text-slate-600 hover:text-primary hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'text-slate-600 hover:text-primary hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                                         }`}
                                 >
                                     <span className="material-symbols-outlined text-lg">person</span>
@@ -56,7 +58,18 @@ export default function Navbar() {
                                 </Link>
                             </nav>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                                {/* Theme Toggle */}
+                                <button
+                                    onClick={toggleTheme}
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
+                                    title={isDark ? 'Light Mode' : 'Dark Mode'}
+                                >
+                                    <span className="material-symbols-outlined text-lg">
+                                        {isDark ? 'light_mode' : 'dark_mode'}
+                                    </span>
+                                </button>
+
                                 {/* Language Toggle */}
                                 <button
                                     onClick={toggleLanguage}
@@ -88,6 +101,17 @@ export default function Navbar() {
                         </>
                     ) : (
                         <>
+                            {/* Theme Toggle */}
+                            <button
+                                onClick={toggleTheme}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
+                                title={isDark ? 'Light Mode' : 'Dark Mode'}
+                            >
+                                <span className="material-symbols-outlined text-lg">
+                                    {isDark ? 'light_mode' : 'dark_mode'}
+                                </span>
+                            </button>
+
                             {/* Language Toggle */}
                             <button
                                 onClick={toggleLanguage}

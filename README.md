@@ -1,20 +1,20 @@
 # Cardly 🎴
 
-Modern, şık ve kişiselleştirilebilir dijital kartvizit platformu.
+Modern, stylish and customizable digital business card platform.
 
 **Live Website:** [cardly.qzz.io](https://cardly.qzz.io)
 
-## ✨ Özellikler
+## ✨ Features
 
-- 🎨 **Çoklu Şablon Desteği** - Playful ve Earthy şablonları
-- 🌓 **Karanlık/Aydınlık Mod** - Otomatik tema desteği
-- 🌍 **Çok Dil Desteği** - Türkçe ve İngilizce
-- 📱 **Responsive Tasarım** - Mobil uyumlu
-- 🔗 **Özelleştirilebilir Linkler** - Sosyal medya, website, portfolio
-- 📷 **Profil Fotoğrafı Yükleme** - Cloudinary entegrasyonu
-- 🔐 **Firebase Auth** - Google ile giriş
+- 🎨 **Multiple Templates** - Playful and Earthy designs
+- 🌓 **Dark/Light Mode** - Automatic theme support with toggle
+- 🌍 **Multi-Language** - Turkish and English
+- 📱 **Responsive Design** - Mobile-friendly
+- 🔗 **Customizable Links** - Social media, website, portfolio
+- 📷 **Profile Photo Upload** - Cloudinary integration
+- 🔐 **Firebase Auth** - Google sign-in
 
-## 🛠️ Teknolojiler
+## 🛠️ Technologies
 
 - **Frontend:** React 18, Vite
 - **Styling:** Tailwind CSS
@@ -22,28 +22,28 @@ Modern, şık ve kişiselleştirilebilir dijital kartvizit platformu.
 - **Storage:** Cloudinary
 - **Icons:** Material Symbols
 
-## 🚀 Kurulum
+## 🚀 Installation
 
 ```bash
-# Bağımlılıkları yükle
+# Install dependencies
 npm install
 
-# Geliştirme sunucusunu başlat
+# Start development server
 npm run dev
 
 # Production build
 npm run build
 ```
 
-## 📁 Proje Yapısı
+## 📁 Project Structure
 
 ```
 src/
 ├── components/
-│   ├── templates/       # Şablon bileşenleri
+│   ├── templates/       # Template components
 │   │   ├── PlayfulTemplate.jsx
 │   │   └── EarthyTemplate.jsx
-│   ├── editors/         # Şablon düzenleyicileri
+│   ├── editors/         # Template editors
 │   │   ├── PlayfulEditor.jsx
 │   │   └── EarthyEditor.jsx
 │   ├── Dashboard.jsx
@@ -52,33 +52,32 @@ src/
 │   └── ...
 ├── context/
 │   ├── AuthContext.jsx
-│   └── LanguageContext.jsx
-├── data/
-│   └── templates.js
+│   ├── LanguageContext.jsx
+│   └── ThemeContext.jsx
 └── firebase.js
 ```
 
-## 🎨 Şablonlar
+## 🎨 Templates
 
 ### Playful
-Eğlenceli, dinamik tasarım. Yüzen baloncuklar ve organik şekiller.
+Fun, dynamic design with floating bubbles and organic shapes.
 
 ### Earthy
-Doğal, organik renk paleti. Hareketli arka plan efektleri ve dokulu görünüm.
+Natural, organic color palette with animated backgrounds and textured appearance. Shows up to 4 floating links; additional links appear as round icon buttons.
 
-## ⚙️ Yapılandırma
+## ⚙️ Configuration
 
 ### Firebase
-`src/firebase.js` dosyasında Firebase yapılandırmanızı ayarlayın.
+Configure your Firebase settings in `src/firebase.js`.
 
 ### Cloudinary
-`src/components/AccountSettings.jsx` dosyasında:
+In `src/components/AccountSettings.jsx`:
 ```javascript
 const CLOUDINARY_CLOUD_NAME = 'your_cloud_name';
 const CLOUDINARY_UPLOAD_PRESET = 'your_preset';
 ```
 
-## 📄 Lisans
+## 📄 License
 
 MIT License
 
