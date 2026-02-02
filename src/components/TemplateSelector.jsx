@@ -17,7 +17,6 @@ export default function TemplateSelector({ currentTemplate, onSelect, user }) {
 
     const handleSelect = (templateId) => {
         onSelect(templateId);
-        setPreviewTemplate(templateId);
     };
 
     return (

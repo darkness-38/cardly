@@ -25,12 +25,8 @@ export default function PublicProfile() {
                     const userData = { id: userDoc.id, ...userDoc.data() };
                     setUser(userData);
 
-                    // Set links from user data
-                    const userLinks = [];
-                    if (userData.website) {
-                        userLinks.push({ title: 'Website', url: userData.website });
-                    }
-                    setLinks(userLinks);
+                    // Set links from user data - use the links array from Firestore
+                    setLinks(userData.links || []);
 
                     // Increment views
                     socialService.incrementProfileViews(userData.id);
@@ -40,11 +36,7 @@ export default function PublicProfile() {
                     if (userDoc.exists()) {
                         const userData = { id: userDoc.id, ...userDoc.data() };
                         setUser(userData);
-                        const userLinks = [];
-                        if (userData.website) {
-                            userLinks.push({ title: 'Website', url: userData.website });
-                        }
-                        setLinks(userLinks);
+                        setLinks(userData.links || []);
 
                         // Increment views
                         socialService.incrementProfileViews(userData.id);
