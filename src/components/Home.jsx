@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Home() {
     const { isAuthenticated } = useAuth();
     const { t, language, toggleLanguage } = useLanguage();
+    const { isDark, toggleTheme } = useTheme();
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -22,6 +24,17 @@ export default function Home() {
                         <a className="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors" href="#templates">{t('templates')}</a>
                     </nav>
                     <div className="flex items-center gap-3">
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
+                            title={isDark ? 'Light Mode' : 'Dark Mode'}
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {isDark ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+
                         {/* Language Toggle */}
                         <button
                             onClick={toggleLanguage}
