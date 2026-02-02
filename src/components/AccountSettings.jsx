@@ -8,6 +8,7 @@ export default function AccountSettings({ onClose }) {
     const { user, updateProfile } = useAuth();
     const { language } = useLanguage();
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
 
@@ -86,6 +87,60 @@ export default function AccountSettings({ onClose }) {
         if (!name) return '?';
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     };
+    const CLOUDINARY_UPLOAD_PRESET = 'avatarpfp';
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            setError(language === 'tr' ? 'Lütfen geçerli bir resim dosyası seçin' : 'Please select a valid image file');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            setError(language === 'tr' ? 'Resim boyutu 10MB\'dan küçük olmalıdır' : 'Image size must be less than 10MB');
+            return;
+        }
+
+        // Check if Cloudinary is configured
+        if (CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME' || CLOUDINARY_UPLOAD_PRESET === 'YOUR_UPLOAD_PRESET') {
+            setError(language === 'tr'
+                ? 'Cloudinary ayarlanmamış. Kod içindeki talimatları takip edin.'
+                : 'Cloudinary not configured. Follow instructions in code.');
+            return;
+        }
+
+        setUploading(true);
+        setError('');
+
+        try {
+            const uploadData = new FormData();
+            uploadData.append('file', file);
+            uploadData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            uploadData.append('folder', 'cardly_avatars');
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+                { method: 'POST', body: uploadData }
+            );
+
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+
+            const data = await response.json();
+
+            setFormData(prev => ({ ...prev, avatar: data.secure_url }));
+            setSuccess(language === 'tr' ? 'Fotoğraf yüklendi!' : 'Photo uploaded!');
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            console.error('Upload error:', err);
+            setError(language === 'tr' ? 'Yükleme hatası. Tekrar deneyin.' : 'Upload error. Please try again.');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -119,27 +174,50 @@ export default function AccountSettings({ onClose }) {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Avatar Section */}
                         <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50">
-                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-2xl font-bold text-white shrink-0 overflow-hidden">
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-2xl font-bold text-white shrink-0 overflow-hidden relative group">
                                 {formData.avatar ? (
                                     <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
                                     getInitials(formData.name)
+                                )}
+                                {uploading && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                        <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    </div>
                                 )}
                             </div>
                             <div className="flex-1">
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                     {language === 'tr' ? 'Profil Fotoğrafı' : 'Profile Picture'}
                                 </label>
-                                <input
-                                    type="url"
-                                    name="avatar"
-                                    value={formData.avatar}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white"
-                                    placeholder="https://..."
-                                />
-                                <p className="text-xs text-slate-500 mt-1">
-                                    {language === 'tr' ? 'Görsel URL\'si yapıştırın' : 'Paste an image URL'}
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="file"
+                                        id="avatar-upload"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        className="hidden"
+                                        disabled={uploading}
+                                    />
+                                    <label
+                                        htmlFor="avatar-upload"
+                                        className={`px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">upload</span>
+                                        {language === 'tr' ? 'Fotoğraf Seç' : 'Choose Photo'}
+                                    </label>
+                                    {formData.avatar && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, avatar: '' }))}
+                                            className="px-4 py-2 rounded-xl border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium transition-colors"
+                                        >
+                                            {language === 'tr' ? 'Kaldır' : 'Remove'}
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-xs text-slate-500 mt-2">
+                                    {language === 'tr' ? 'Maksimum 5MB. JPG, PNG veya GIF.' : 'Max 5MB. JPG, PNG or GIF.'}
                                 </p>
                             </div>
                         </div>
