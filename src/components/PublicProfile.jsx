@@ -12,6 +12,19 @@ export default function PublicProfile() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Force light mode on public profiles
+    useEffect(() => {
+        const wasDark = document.documentElement.classList.contains('dark');
+        document.documentElement.classList.remove('dark');
+
+        return () => {
+            // Restore dark mode if it was active before
+            if (wasDark) {
+                document.documentElement.classList.add('dark');
+            }
+        };
+    }, []);
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
