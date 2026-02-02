@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import Navbar from './Navbar';
 import TemplateSelector from './TemplateSelector';
 import PlayfulEditor from './editors/PlayfulEditor';
+import EarthyEditor from './editors/EarthyEditor';
 import AccountSettings from './AccountSettings';
 import { templates } from '../data/templates';
 
@@ -371,7 +372,8 @@ export default function Profile() {
                 {isEditing && (
                     <>
                         {currentTemplate === 'playful' && <PlayfulEditor onClose={() => setIsEditing(false)} />}
-                        {currentTemplate !== 'playful' && (
+                        {currentTemplate === 'earthy' && <EarthyEditor onClose={() => setIsEditing(false)} />}
+                        {!['playful', 'earthy'].includes(currentTemplate) && (
                             <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                                 {/* Default Editor content fallback */}
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('editProfileTitle')}</h2>

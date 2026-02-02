@@ -1,8 +1,10 @@
 // Template index - exports all templates
 import PlayfulTemplate from './PlayfulTemplate';
+import EarthyTemplate from './EarthyTemplate';
 
 export const templateComponents = {
     'playful': PlayfulTemplate,
+    'earthy': EarthyTemplate,
 };
 
 export const getTemplateComponent = (templateId) => {
@@ -11,4 +13,5 @@ export const getTemplateComponent = (templateId) => {
 
 export {
     PlayfulTemplate,
+    EarthyTemplate,
 };

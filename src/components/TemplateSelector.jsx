@@ -44,6 +44,15 @@ export default function TemplateSelector({ currentTemplate, onSelect, user }) {
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-amber-400 border-2 border-dashed border-amber-600"></div>
                                 </div>
                             )}
+                            {template.id === 'earthy' && (
+                                <div className="h-full bg-[#f2efeb] relative overflow-hidden">
+                                    <div className="absolute top-[-20%] left-[-20%] w-16 h-16 bg-[#8a9a5b]/20 rounded-full blur-xl"></div>
+                                    <div className="absolute bottom-[-10%] right-[-10%] w-12 h-12 bg-[#ee5b2b]/20 rounded-full blur-lg"></div>
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-gradient-to-br from-[#8a9a5b] to-[#ee5b2b] border-2 border-white shadow-lg"></div>
+                                    <div className="absolute top-3 right-3 w-6 h-3 bg-white rounded-full shadow-sm"></div>
+                                    <div className="absolute bottom-3 left-3 w-6 h-3 bg-white rounded-full shadow-sm"></div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Template Name */}
